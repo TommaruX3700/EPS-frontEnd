@@ -443,9 +443,9 @@
     },
     "user_settings": {
         "Shipment_type": "NA",
-        "Lenght": 8000,
-        "Width": 12000,
-        "Height": 8000,
-        "Max Weight": 40
+        "Lenght": 120,
+        "Width": 120,
+        "Height": 120,
+        "MXWeight": 20
     }
 }

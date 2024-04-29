@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFi
 from PyQt5.QtGui import QPixmap, QImage, QPainter
 from PyQt5.QtCore import Qt
 from PyQt5.QtWebEngineWidgets import QWebEngineSettings, QWebEngineView
-import time
 import pandas as pd
 import json
 import configparser 
@@ -14,7 +13,6 @@ import jinja2
 import subprocess
 from datetime import datetime
 import fitz
-import bs4
 
 file_path = ''
 
