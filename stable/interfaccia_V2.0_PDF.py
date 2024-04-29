@@ -1,0 +1,450 @@
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QDialog, QFormLayout, QLabel, QComboBox, QLineEdit, QHBoxLayout, QGroupBox, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
+from PyQt5.QtGui import QPixmap, QImage, QPainter
+from PyQt5.QtCore import Qt
+from PyQt5.QtWebEngineWidgets import QWebEngineSettings, QWebEngineView
+import time
+import pandas as pd
+import json
+import configparser 
+import os
+import json
+import pdfkit
+import jinja2
+import subprocess
+from datetime import datetime
+import fitz
+import bs4
+
+file_path = ''
+
+def json_updater(json_path,Lenght,Width,Height,MXWeight,Shipment_type):
+    if Lenght is None or Width is None or Height is None: # or Shipment_type is None 
+        print('Valori utente non caricati\nDefault Lenght : 120\nWidth : 120\nHeight : 120\nMxWeight : 20\n')
+        new_data ={"Shipment_type":"NA",
+        "Lenght": 120,
+        "Width": 120,
+        "Height": 120,
+        "MXWeight" : 20
+        }
+        with open(json_path,'r+') as j:
+            file_data = json.load(j)
+            file_data["user_settings"] = (new_data)
+            j.seek(0)
+            json.dump(file_data, j, indent = 4)
+    else:
+        print('Valori utente caricati\nLenght : {0}\nWidth : {1}\nHeight : {2}\nMax Weight : {3}'.format(Lenght,Width,Height,MXWeight))
+        if Shipment_type is None:
+            Shipment_type = "NA"
+        new_data = new_data ={"Shipment_type":Shipment_type,
+        "Lenght":Lenght,
+        "Width": Width,
+        "Height": Height,
+        "Max Weight" : MXWeight
+        }
+        with open(json_path,'r+') as j:
+            file_data = json.load(j)
+            file_data["user_settings"] = (new_data)
+            j.seek(0)
+        with open(json_path,'w') as j:
+            json.dump(file_data, j, indent = 4)
+
+
+def create_pdf(mainfolder,data):
+    '''funzione che crea il pdf partendo da un file html'''
+    built_pallets={}
+    temp_pallet = {}
+    buff_pallet = {}
+    n_p=0
+    try:
+        html_path = mainfolder
+        html_path += 'template_bolla.html'
+        or_html = mainfolder
+        or_html += 'default'
+        json_path = mainfolder
+        json_path += '\EPS_MODEL\input_for_model.json'
+        my_data = load_json(json_path)
+        for pallet in (data['Pallets']):
+            i=0
+            for pacco in pallet['Packs']:
+                idx = str(n_p)
+                idx += '_'
+                idx += str(i)
+                temp_pallet[idx] = pacco
+                built_pallets[idx] = my_data[str(pacco-1)]
+                i=i+1
+            n_p = n_p+1
+
+        with open(or_html, 'r') as h: #RESET DEL FILE HTML
+            orBuff = h.readlines()    #RESET DEL FILE HTML
+        with open(html_path, 'w') as h:#RESET DEL FILE HTML
+            h.writelines(orBuff)      #RESET DEL FILE HTML
+
+        with open(html_path, 'r') as h:
+            buffer = h.readlines()
+        strt_line = []
+        for linea in buffer:
+            if "tabella_dinamica" in linea:
+                print("Da ",buffer.index(linea))
+                strt_line.append(buffer.index(linea))
+                if "'id=\"end_of_tabella_dinamica\">'" in linea:
+                    print("A: ",buffer.index(linea))
+                    tt_lines = strt_line[0] - strt_line[1]
+                    break
+        tt_lines = strt_line[1] - strt_line[0]
+        for pallet in built_pallets:
+            i=0
+            idx = tt_lines -2
+            k = strt_line[1]
+            stringhe = []
+            stringhe.append('''<tr id="colonna_dinamica">\n''')
+            stringhe.append('''<th scope="row" style="font-family:\'Serif\'">{0}</th>\n'''.format(str(pallet)))
+            stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(built_pallets[str(pallet)]['NUMERO_COLLO']))
+            stringhe.append('''<td style="font-family:\'Serif\'">'xxxx'</td>\n''')
+            fr = built_pallets[str(pallet)]['FLAG_RUOTABILE']
+            if fr == '':
+                fr = 'No'
+            else:
+                fr = 'Yes'
+            stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(fr))   
+            fs = built_pallets[str(pallet)]['FLAG_SOVRAPPONIBILE']
+            if fs == '':
+                fs = 'No'
+            else:
+                fs = 'Yes'
+            stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(fs))
+            stringhe.append('''</tr id="end_of_colonna_dinamica">\n''')
+            for stringa in stringhe:
+                buffer.insert(k,stringa)
+                k = k + 1
+                i=i+1
+
+        with open(html_path,'w') as h:
+            h.writelines(buffer)
+
+        template_loader = jinja2.FileSystemLoader(mainfolder)
+        template_env = jinja2.Environment(loader=template_loader)
+        bollaPathOut = mainfolder
+        bollaPathOut += 'bolla.pdf'
+        cssPath = mainfolder
+        cssPath += 'Bootstrap\\bootstrap-5.0.2-dist\\css\\bootstrap.css'
+        template = template_env.get_template('template_bolla.html')
+        dt_naive = datetime.now()
+        context={"nome_cliente":"Antzony Ungureghet()","via_cliente": "Via dei banani Torti 24","citt_cliente":"Bologna (dei gay)","naz_cliente":"Romania","cap_cliente":36069,"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M:%S")}
+        output_text = template.render(context)
+        options={"enable-local-file-access": ""}
+        wkhtmltopdf = mainfolder
+        wkhtmltopdf += 'wkhtmltox\\bin\\wkhtmltopdf.exe'
+        pdfConfig = pdfkit.configuration(wkhtmltopdf= wkhtmltopdf)
+        pdfkit.from_string(output_text,options=options, output_path=bollaPathOut, configuration=pdfConfig,css=cssPath)
+    except Exception as err:
+        print(err)
+
+def load_json(file_path):
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    return data
+
+def create_image(rectangles, plane_dimensions):
+    print("bypasscreate_image")
+
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle('Main Window')
+        self.setGeometry(100, 100, 320, 210)
+
+        upload_button = QPushButton('Recupera collo da CSV', self)
+        upload_button.clicked.connect(self.show_settings_window)
+        upload_button.setFixedSize(320, 70)
+
+        seatchDB_button = QPushButton('Recupera collo da DataBase', self)
+        seatchDB_button.clicked.connect(self.show_DB_window)
+        seatchDB_button.setFixedSize(320, 70)
+
+        seatchPLT_DB_button = QPushButton('Recupera pallet da DataBase', self)
+        seatchPLT_DB_button.clicked.connect(self.show_DB_window)
+        seatchPLT_DB_button.setFixedSize(320, 70)
+
+        layout = QVBoxLayout()
+        layout.addWidget(upload_button)
+        layout.addWidget(seatchDB_button)
+        layout.addWidget(seatchPLT_DB_button)
+
+        self.setLayout(layout)
+        
+
+    def show_DB_window(self):
+        print("Premuto!")
+
+
+
+    def show_settings_window(self, *args, **kwargs):
+        askForCSV = kwargs.get('askForCSV')
+        if askForCSV is not False:
+            file_dialog = QFileDialog()
+            file_path, _ = file_dialog.getOpenFileName(self, 'Open CSV File', '', 'CSV files (*.csv)')
+            if file_path:
+                mainfolder = ''
+                config_path = ''
+                mainfolder_buff=__file__
+                mainfolder_buff = mainfolder_buff.split(sep='\\')
+                mainfolder_buff.pop(-1)
+                for name in mainfolder_buff:
+                    mainfolder += name
+                    mainfolder += '\\' 
+                config_path += mainfolder
+                config_path += 'config.ini'
+                config = configparser.ConfigParser()
+                config.read(config_path)
+                uscita= pd.read_csv(file_path, delimiter=";",usecols=["NUM_SPEDIZIONE","NUMERO_COLLO","CODICE_CLIENTE","PESO_NETTO","PESO_LORDO","BASE_MAGGIORE","BASE_MINORE","ALTEZZA","FLAG_PALETTIZZABILE","FLAG_SOVRAPPONIBILE","FLAG_RUOTABILE"])
+                uscita= uscita.fillna("")
+                uscita.to_json(config['DEFAULT']['nome_json'],orient='index', indent=4)
+            if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
+                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) #bisogna inserire qua i parametri richiesti sulla funziona main 
+            else:
+                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=None)
+
+            json_path = mainfolder
+            json_path += config['DEFAULT']['nome_json']
+            checkForErrorPath = mainfolder
+            checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
+            print("directory output.json: {0}".format(json_path))
+            try:
+                checkForError = (subprocess.check_output([checkForErrorPath, str(json_path)]))
+            except Exception as err:
+                print("Programma terminato con codice diverso da 0 \nCode: {0}".format(checkForError))
+                exit(1)
+            
+            json_path = mainfolder
+            json_path += 'output.json'
+            with open(json_path) as json_file:
+                data = json.load(json_file)
+            print("\nOutput ESP_MODEL.exe: {0}\n".format(data))
+            create_pdf(mainfolder,data)
+            self.settings_window = SettingsWindow(file_path)
+            self.settings_window.show()
+            self.close()
+        else:
+            test = kwargs.get('length_edit')
+            mainfolder = ''
+            config_path = ''
+            mainfolder_buff=__file__
+            mainfolder_buff = mainfolder_buff.split(sep='\\')
+            mainfolder_buff.pop(-1)
+            for name in mainfolder_buff:
+                mainfolder += name
+                mainfolder += '\\' 
+            config_path += mainfolder
+            config_path += 'config.ini'
+            config = configparser.ConfigParser()
+            config.read(config_path)
+            if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
+                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) #bisogna inserire qua i parametri richiesti sulla funziona main 
+            else:
+                Lenght = int((kwargs.get('length_edit')).displayText())
+                Width = int((kwargs.get('width_edit')).displayText()) 
+                Height = int((kwargs.get('height_edit')).displayText())
+                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=None)
+
+            json_path = mainfolder
+            json_path += config['DEFAULT']['nome_json']
+            checkForErrorPath = mainfolder
+            checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
+            print("path output.json {0}".format(json_path))
+            try:
+                checkForError = (subprocess.check_output([checkForErrorPath, str(json_path)]))
+            except Exception as err:
+                print("Programma terminato con codice diverso da 0 \nCode: {0}".format(checkForError))
+                exit(1)
+            
+            json_path = mainfolder
+            json_path += 'output.json'
+            with open(json_path) as json_file:
+                data = json.load(json_file)
+            print("\nOutput ESP_MODEL.exe: {0}\n".format(data))
+            create_pdf(mainfolder,data)
+            self.settings_window = SettingsWindow(csv_file_path=None)
+            self.settings_window.show()
+            self.close()
+
+class SettingsWindow(QDialog):
+    def __init__(self, csv_file_path):
+        super().__init__()  
+
+        self.csv_file_path = csv_file_path
+        global file_path
+        if csv_file_path is not None:
+            file_path = csv_file_path
+        self.root = os.path.dirname(os.path.abspath(__file__))
+
+        self.image_settings = {
+            "type": "aereo",
+            "Length": 800,
+            "Width": 1200,
+            "Height": 800,
+            "MXWeight":40
+        }
+
+        self.setWindowTitle('Settings Window')
+
+        layout = QHBoxLayout()       
+        settings_groupbox = QGroupBox('Settings')
+
+        form_layout = QFormLayout()
+
+        type_combobox1 = QComboBox(self)
+        type_combobox1.setObjectName('trasporto')
+        type_combobox1.addItems(['Aereo', 'Treno', 'Nave', 'Furgone'])
+        type_combobox1.setCurrentText(self.image_settings['type'])
+        form_layout.addRow('Shipment Type:', type_combobox1)
+
+        length_edit = QLineEdit(str(self.image_settings['Length']))
+        form_layout.addRow('Length:', length_edit)
+        length_edit.setObjectName('Length')
+
+        width_edit = QLineEdit(str(self.image_settings['Width']))
+        form_layout.addRow('Width:', width_edit)
+        width_edit.setObjectName('Width')
+
+        height_edit = QLineEdit(str(self.image_settings['Height']))
+        form_layout.addRow('Height:', height_edit)
+        height_edit.setObjectName('Height')
+
+        weight_edit = QLineEdit(str(self.image_settings['MXWeight']))
+        form_layout.addRow('Max Weight:', weight_edit)
+        weight_edit.setObjectName('MXWeight')
+
+        
+        type_combobox2 = QComboBox(self)
+        type_combobox2.addItems(['1', '2', '3'])
+        type_combobox2.setObjectName('selezione_pallet')
+        form_layout.addRow('Numero Pallet massimo:', type_combobox2)
+        if isinstance(type_combobox2.currentText(), str) == True:
+            self.selezione_pallet = int(type_combobox2.currentText())
+            if (type_combobox2.currentIndex()) is None:
+                pass
+            else:
+                pass
+
+            pass
+        else:
+            print("no")
+
+        settings_groupbox.setLayout(form_layout)
+
+        # Image Preview
+        image_preview_groupbox = QGroupBox('PDF Preview')
+        self.image_label = QLabel(self)
+        self.update_image_preview()
+        image_layout = QVBoxLayout()
+        image_layout.addWidget(self.image_label)
+        image_preview_groupbox.setLayout(image_layout)
+        layout.addWidget(settings_groupbox)
+        layout.addWidget(image_preview_groupbox)
+
+        self.setLayout(layout)
+
+        apply_button = QPushButton('Generate PDF', self)
+        apply_button.clicked.connect(lambda: main_window.show_settings_window(width_edit = width_edit,weight_edit = weight_edit,height_edit = height_edit,length_edit = length_edit,askForCSV = False))
+        form_layout.addRow(apply_button)
+
+        print_button = QPushButton('PRINT', self)
+        print_button.clicked.connect(self.apply_settings_and_show_image)#DEVE CHIAMARE LA FUNZIONE DI STAMPA DI SISTEMA
+        form_layout.addRow(print_button)
+
+        writeDB_button = QPushButton('Upload to DB', self)
+        writeDB_button.clicked.connect(self.apply_settings_and_show_image)#Effettua un insert al database di bitchesgoes
+        form_layout.addRow(writeDB_button)
+        
+
+
+    def apply_settings_and_show_image(self):
+        mainfolder = ''
+        config_path = ''
+        mainfolder_buff=__file__
+        mainfolder_buff = mainfolder_buff.split(sep='\\')
+        mainfolder_buff.pop(-1)
+        for name in mainfolder_buff:
+            mainfolder += name
+            mainfolder += '\\' 
+        config_path += mainfolder
+        config_path += 'config.ini'
+        config = configparser.ConfigParser()
+        config.read(config_path)
+
+        try:
+            self.image_settings['type'] = self.findChild(QComboBox, 'trasporto').currentText()
+        except AttributeError as err:
+            pass
+        try:
+            self.image_settings['Length'] = float(self.findChild(QLineEdit, 'Length').text())
+        except AttributeError as err:
+            pass
+        try:
+            self.image_settings['Width'] = float(self.findChild(QLineEdit, 'Width').text())
+        except AttributeError as err:
+            pass
+        try:
+            self.image_settings['Height'] = float(self.findChild(QLineEdit, 'Height').text())
+        except AttributeError as err:
+            pass
+        try:
+            self.image_settings['MXWeight'] = float(self.findChild(QLineEdit, 'MXWeight').text())
+        except AttributeError as err:
+            pass
+        try:
+            self.selezione_pallet = int((self.findChild(QComboBox, 'selezione_pallet')).currentText())
+        except AttributeError as err:
+            pass
+        json_updater(Lenght=self.image_settings['Length'],Width=self.image_settings['Width'],Height=self.image_settings['Height'],MXWeight = self.image_settings['MXWeight'],json_path=config['DEFAULT']['nome_json'],Shipment_type=self.image_settings['type'])
+        self.update_image_preview()
+
+    def update_image_preview(self):
+        pdf = (self.root).replace("\\","/")
+        super().__init__()
+       #("/images_output/output_image{0}.png".format(self.selezione_pallet))
+        pdf += '/bolla.pdf'
+        doc = fitz.open(pdf)
+        for i, page in enumerate(doc):
+            image = (self.root).replace("\\","/")
+            pix = page.get_pixmap()  # render page to an image
+            image += "/bolla"
+            image += str(i)
+            image += ".png"
+            pix.save(image)
+        self.im = QPixmap(image)
+        self.label = QLabel()
+        self.image_label.setPixmap(self.im)
+
+    def generate_image(self):
+        paths = []
+
+    def show_pdf_preview_window(self):
+        self.pdf_preview_window = PDFPreviewWindow(self.image_settings)
+        self.pdf_preview_window.show()
+        self.close()
+
+class PDFPreviewWindow(QWidget):
+    def __init__(self, image_settings):
+        super().__init__()
+
+        self.image_settings = image_settings
+
+        self.setWindowTitle('PDF Preview Window')
+
+        layout = QVBoxLayout()
+
+        pdf_preview_button = QPushButton('Preview PDF', self)
+        pdf_preview_button.clicked.connect(self.generate_and_preview_pdf)
+
+        layout.addWidget(pdf_preview_button)
+
+        self.setLayout(layout)
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    main_window = MainWindow()
+    main_window.show()
+    sys.exit(app.exec_())
