@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFi
 from PyQt5.QtGui import QPixmap, QImage, QPainter
 from PyQt5.QtCore import Qt
 from PyQt5.QtWebEngineWidgets import QWebEngineSettings, QWebEngineView
+from PyQt5 import QtPrintSupport,QtWidgets
 import pandas as pd
 import json
 import configparser 
@@ -100,7 +101,10 @@ def create_pdf(mainfolder,data):
             stringhe.append('''<tr id="colonna_dinamica">\n''')
             stringhe.append('''<th scope="row" style="font-family:\'Serif\'">{0}</th>\n'''.format(str(pallet)))
             stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(built_pallets[str(pallet)]['NUMERO_COLLO']))
-            stringhe.append('''<td style="font-family:\'Serif\'">'xxxx'</td>\n''')
+            dimensioni = str(built_pallets[str(pallet)]['BASE_MAGGIORE'])
+            dimensioni += 'x'
+            dimensioni += str(built_pallets[str(pallet)]['BASE_MINORE'])
+            stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(dimensioni))
             fr = built_pallets[str(pallet)]['FLAG_RUOTABILE']
             if fr == '':
                 fr = 'No'
@@ -130,7 +134,7 @@ def create_pdf(mainfolder,data):
         cssPath += 'Bootstrap\\bootstrap-5.0.2-dist\\css\\bootstrap.css'
         template = template_env.get_template('template_bolla.html')
         dt_naive = datetime.now()
-        context={"nome_cliente":"Antzony Ungureghet()","via_cliente": "Via dei banani Torti 24","citt_cliente":"Bologna (dei gay)","naz_cliente":"Romania","cap_cliente":36069,"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M:%S")}
+        context={"nome_cliente":"Mario Rossi","via_cliente": "Via Aldo Moro 24","citt_cliente":"Bologna","naz_cliente":"Italia","cap_cliente":36069,"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M")}
         output_text = template.render(context)
         options={"enable-local-file-access": ""}
         wkhtmltopdf = mainfolder
@@ -152,7 +156,7 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle('Main Window')
+        self.setWindowTitle('Menù Principale')
         self.setGeometry(100, 100, 320, 210)
 
         upload_button = QPushButton('Recupera collo da CSV', self)
@@ -178,6 +182,11 @@ class MainWindow(QWidget):
     def show_DB_window(self):
         print("Premuto!")
 
+    def printPDF(self):
+
+        path = os.path.abspath(os.path.dirname(sys.argv[0]))
+        path += '\\bolla.pdf'
+        subprocess.Popen([path], shell=True)
 
 
     def show_settings_window(self, *args, **kwargs):
@@ -272,6 +281,7 @@ class MainWindow(QWidget):
 class SettingsWindow(QDialog):
     def __init__(self, csv_file_path):
         super().__init__()  
+        self.setWindowTitle('Menù Impostazioni')
 
         self.csv_file_path = csv_file_path
         global file_path
@@ -346,15 +356,16 @@ class SettingsWindow(QDialog):
 
         self.setLayout(layout)
 
-        apply_button = QPushButton('Generate PDF', self)
+        apply_button = QPushButton('Rigenera il  PDF', self)
         apply_button.clicked.connect(lambda: main_window.show_settings_window(width_edit = width_edit,weight_edit = weight_edit,height_edit = height_edit,length_edit = length_edit,askForCSV = False))
         form_layout.addRow(apply_button)
 
-        print_button = QPushButton('PRINT', self)
-        print_button.clicked.connect(main_window.show_DB_window)#DEVE CHIAMARE LA FUNZIONE DI STAMPA DI SISTEMA
+
+        print_button = QPushButton('Stampa il documento e mostra anteprima', self)
+        print_button.clicked.connect(main_window.printPDF)#DEVE CHIAMARE LA FUNZIONE DI STAMPA DI SISTEMA
         form_layout.addRow(print_button)
 
-        writeDB_button = QPushButton('Upload to DB', self)
+        writeDB_button = QPushButton('Carica la bolla nel DataBase', self)
         writeDB_button.clicked.connect(main_window.show_DB_window)#Effettua un insert al database di bitchesgoes
         form_layout.addRow(writeDB_button)
         
@@ -414,6 +425,10 @@ class SettingsWindow(QDialog):
             image += str(i)
             image += ".png"
             pix.save(image)
+        image = (self.root).replace("\\","/")
+        image += "/bolla"
+        image += str(0)
+        image += ".png"
         self.im = QPixmap(image)
         self.label = QLabel()
         self.image_label.setPixmap(self.im)
@@ -432,7 +447,7 @@ class PDFPreviewWindow(QWidget):
 
         self.image_settings = image_settings
 
-        self.setWindowTitle('PDF Preview Window')
+        self.setWindowTitle('Menù Impostazioni')
 
         layout = QVBoxLayout()
 
