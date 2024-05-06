@@ -12,6 +12,8 @@ import pdfkit
 import jinja2
 import subprocess
 from datetime import datetime
+from PyQt5.QtWidgets import QApplication
+import qpageview
 import fitz
 
 file_path = ''
@@ -349,11 +351,11 @@ class SettingsWindow(QDialog):
         form_layout.addRow(apply_button)
 
         print_button = QPushButton('PRINT', self)
-        print_button.clicked.connect(self.apply_settings_and_show_image)#DEVE CHIAMARE LA FUNZIONE DI STAMPA DI SISTEMA
+        print_button.clicked.connect(main_window.show_DB_window)#DEVE CHIAMARE LA FUNZIONE DI STAMPA DI SISTEMA
         form_layout.addRow(print_button)
 
         writeDB_button = QPushButton('Upload to DB', self)
-        writeDB_button.clicked.connect(self.apply_settings_and_show_image)#Effettua un insert al database di bitchesgoes
+        writeDB_button.clicked.connect(main_window.show_DB_window)#Effettua un insert al database di bitchesgoes
         form_layout.addRow(writeDB_button)
         
 
