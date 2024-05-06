@@ -38,10 +38,12 @@
             <div class="me-auto p-2 bd-highlight">
                 <h6><small style="font-family:'Serif'">Delivery note N°: </small></h6>
                 <h6><small style="font-family:'Serif'">Issue date: </small></h6>
+                <h6><small style="font-family:'Serif'">Shipment Type: </small></h6>
             </div>
             <div class="me-auto p-2 bd-highlight">
                 <h6><strong style="font-family:'Serif'">{{n_delivery}}</strong></h6>
                 <h6><strong style="font-family:'Serif'">{{date_of_delivery}}</strong></h6>
+                <h6><strong style="font-family:'Serif'">{{shipm_type}}</strong></h6>
             </div>
         </div>
     </div>

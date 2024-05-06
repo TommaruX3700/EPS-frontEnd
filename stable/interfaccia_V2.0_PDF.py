@@ -134,7 +134,7 @@ def create_pdf(mainfolder,data):
         cssPath += 'Bootstrap\\bootstrap-5.0.2-dist\\css\\bootstrap.css'
         template = template_env.get_template('template_bolla.html')
         dt_naive = datetime.now()
-        context={"nome_cliente":"Mario Rossi","via_cliente": "Via Aldo Moro 24","citt_cliente":"Bologna","naz_cliente":"Italia","cap_cliente":36069,"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M")}
+        context={"nome_cliente":"Mario Rossi","via_cliente": "Via Aldo Moro 24","citt_cliente":"Bologna","naz_cliente":"Italia","cap_cliente":36069,"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M"),"shipm_type":my_data['user_settings']['Shipment_type']}
         output_text = template.render(context)
         options={"enable-local-file-access": ""}
         wkhtmltopdf = mainfolder
@@ -213,7 +213,7 @@ class MainWindow(QWidget):
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
                 json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) #bisogna inserire qua i parametri richiesti sulla funziona main 
             else:
-                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=None)
+                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
 
             json_path = mainfolder
             json_path += config['DEFAULT']['nome_json']
@@ -255,7 +255,7 @@ class MainWindow(QWidget):
                 Lenght = int((kwargs.get('length_edit')).displayText())
                 Width = int((kwargs.get('width_edit')).displayText()) 
                 Height = int((kwargs.get('height_edit')).displayText())
-                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=None)
+                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
 
             json_path = mainfolder
             json_path += config['DEFAULT']['nome_json']
@@ -357,7 +357,7 @@ class SettingsWindow(QDialog):
         self.setLayout(layout)
 
         apply_button = QPushButton('Rigenera il  PDF', self)
-        apply_button.clicked.connect(lambda: main_window.show_settings_window(width_edit = width_edit,weight_edit = weight_edit,height_edit = height_edit,length_edit = length_edit,askForCSV = False))
+        apply_button.clicked.connect(lambda: main_window.show_settings_window(width_edit = width_edit,weight_edit = weight_edit,height_edit = height_edit,length_edit = length_edit,askForCSV = False,shipment_type=type_combobox1.currentText()))
         form_layout.addRow(apply_button)
 
 
