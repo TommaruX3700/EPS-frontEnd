@@ -1,7 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QDialog, QFormLayout, QLabel, QComboBox, QLineEdit, QHBoxLayout, QGroupBox, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QDialog, QFormLayout, QLabel, QComboBox, QLineEdit, QHBoxLayout, QGroupBox, QSizePolicy, QHeaderView, QTableWidgetItem,QTableWidget
 from PyQt5.QtGui import QPixmap, QImage, QPainter
-from PyQt5.QtCore import Qt
+from PyQt5 import QtCore
 from PyQt5.QtWebEngineWidgets import QWebEngineSettings, QWebEngineView
 from PyQt5 import QtPrintSupport,QtWidgets
 import pandas as pd
@@ -480,17 +480,66 @@ class databasePage(QWidget):
         super().__init__()  
         self.setWindowTitle('Settings Window')
 
-        layout = QHBoxLayout()       
-        settings_groupbox = QGroupBox('Settings')
+        self.left = 0
+        self.top = 0
+        self.width = 800
+        self.height = 850
+   
+        self.setGeometry(self.left, self.top, self.width, self.height) 
+   
+        self.createTable(dbResult=args[0]) 
+   
 
-        form_layout = QFormLayout()
+   
+        self.layout = QVBoxLayout() 
+        self.layout.addWidget(self.tableWidget) 
 
-        type_combobox1 = QComboBox(self)
-        type_combobox1.setObjectName('trasporto')
-        type_combobox1.addItems(['Aereo', 'Treno', 'Nave', 'Furgone'])
-        type_combobox1.setCurrentText('ziopera')
-        form_layout.addRow('Shipment Type:', type_combobox1)
-        print("Dovrebbe aprirsi la finestra")
+        self.button = QPushButton('Avanti ->', self)
+        self.button.setToolTip('Avanti')
+        self.button.move(100,70)
+        self.layout.addWidget(self.button)
+        
+        self.setLayout(self.layout) 
+        #Show window 
+        self.show() 
+   
+    #Create table 
+    def createTable(self,dbResult): 
+        self.tableWidget = QTableWidget() 
+        w = QtWidgets.QWidget()
+        grid = QtWidgets.QGridLayout(w)
+        self.tableWidget.setRowCount(len(dbResult))  
+        self.tableWidget.setColumnCount(11)           
+        
+        self.tableWidget.setItem(0,0, QTableWidgetItem("NUMERO_COLLO")) #corrisponde a ID_PACCO chiave univoca
+        self.tableWidget.setItem(0,1, QTableWidgetItem("NUM_SPEDIZIONE")) 
+        self.tableWidget.setItem(0,2, QTableWidgetItem("CODICE_CLIENTE")) 
+        self.tableWidget.setItem(0,3, QTableWidgetItem("PESO_NETTO")) 
+        self.tableWidget.setItem(0,4, QTableWidgetItem("PESO_LORDO")) 
+        self.tableWidget.setItem(0,5, QTableWidgetItem("BASE_MAGGIORE")) 
+        self.tableWidget.setItem(0,6, QTableWidgetItem("BASE_MINORE"))
+        self.tableWidget.setItem(0,7, QTableWidgetItem("ALTEZZA"))
+        self.tableWidget.setItem(0,8, QTableWidgetItem("FLAG_PALETTIZZABILE"))
+        self.tableWidget.setItem(0,9, QTableWidgetItem("FLAG_SOVRAPPONIBILE"))
+        self.tableWidget.setItem(0,10, QTableWidgetItem("FLAG_RUOTABILE"))
+        
+        for row in dbResult:
+            self.tableWidget.setItem((int(row)),0, QTableWidgetItem(str(row)))
+            self.tableWidget.setItem((int(row)),1, QTableWidgetItem(str((dbResult[row])[1]))) 
+            self.tableWidget.setItem((int(row)),2, QTableWidgetItem(str((dbResult[row])[2]))) 
+            self.tableWidget.setItem((int(row)),3, QTableWidgetItem(str((dbResult[row])[3]))) 
+            self.tableWidget.setItem((int(row)),4, QTableWidgetItem(str((dbResult[row])[4]))) 
+            self.tableWidget.setItem((int(row)),5, QTableWidgetItem(str((dbResult[row])[5]))) 
+            self.tableWidget.setItem((int(row)),6, QTableWidgetItem(str((dbResult[row])[6]))) 
+            self.tableWidget.setItem((int(row)),7, QTableWidgetItem(str((dbResult[row])[7]))) 
+            self.tableWidget.setItem((int(row)),8, QTableWidgetItem(str((dbResult[row])[8]))) 
+            self.tableWidget.setItem((int(row)),9, QTableWidgetItem(str((dbResult[row])[9]))) 
+            self.tableWidget.setItem((int(row)),10, QTableWidgetItem(str((dbResult[row])[10])))
+   
+        #Table will fit the screen horizontally 
+        self.tableWidget.horizontalHeader().setStretchLastSection(True) 
+        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        
 
         
 if __name__ == '__main__':
