@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWebEngineWidgets import QWebEngineSettings, QWebEngineView
 from PyQt5 import QtPrintSupport,QtWidgets
 import pandas as pd
+import mysql.connector
 import json
 import configparser 
 import os
@@ -13,7 +14,7 @@ import pdfkit
 import jinja2
 import subprocess
 from datetime import datetime
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication,QMessageBox
 import qpageview
 import fitz
 
@@ -180,7 +181,24 @@ class MainWindow(QWidget):
         
 
     def show_DB_window(self):
-        print("Premuto!")
+        mydb = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="eps"
+        )
+        buffer_json = {}
+        mycursor = mydb.cursor()
+        mycursor.execute("SELECT * FROM `pacchi` WHERE 1")
+        myresult = mycursor.fetchall()
+        for risultato in myresult:
+            index = str(risultato[0])
+            buffer_json[index] = ''
+            risultato = list(risultato)
+            risultato.remove(risultato[0])
+            buffer_json[index] = risultato
+            
+        databasePage(buffer_json)
 
     def printPDF(self):
 
@@ -207,14 +225,35 @@ class MainWindow(QWidget):
                 config_path += 'config.ini'
                 config = configparser.ConfigParser()
                 config.read(config_path)
+                #BISOGNA FARE LA SELEZIONE DA DATABASE E QUI CARICARE I DATI CHE NORMALMENTE SI SAREBBERO PRESI DAL CSV
                 uscita= pd.read_csv(file_path, delimiter=";",usecols=["NUM_SPEDIZIONE","NUMERO_COLLO","CODICE_CLIENTE","PESO_NETTO","PESO_LORDO","BASE_MAGGIORE","BASE_MINORE","ALTEZZA","FLAG_PALETTIZZABILE","FLAG_SOVRAPPONIBILE","FLAG_RUOTABILE"])
                 uscita= uscita.fillna("")
                 uscita.to_json(config['DEFAULT']['nome_json'],orient='index', indent=4)
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
-                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) #bisogna inserire qua i parametri richiesti sulla funziona main 
+                try:
+                    json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) #bisogna inserire qua i parametri richiesti sulla funziona main 
+                except UnboundLocalError as err:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Errore")
+                    msg.setInformativeText('Nessun file CSV selezionato')
+                    msg.setWindowTitle("Error")
+                    msg.exec_()
+                    self.show_settings_window()
             else:
                 json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
-
+            mainfolder = ''
+            config_path = ''
+            mainfolder_buff=__file__
+            mainfolder_buff = mainfolder_buff.split(sep='\\')
+            mainfolder_buff.pop(-1)
+            for name in mainfolder_buff:
+                mainfolder += name
+                mainfolder += '\\' 
+            config_path += mainfolder
+            config_path += 'config.ini'
+            config = configparser.ConfigParser()
+            config.read(config_path)
             json_path = mainfolder
             json_path += config['DEFAULT']['nome_json']
             checkForErrorPath = mainfolder
@@ -433,30 +472,47 @@ class SettingsWindow(QDialog):
         self.label = QLabel()
         self.image_label.setPixmap(self.im)
 
-    def generate_image(self):
-        paths = []
+    #def generate_image(self):
+    #    paths = []
 
-    def show_pdf_preview_window(self):
-        self.pdf_preview_window = PDFPreviewWindow(self.image_settings)
-        self.pdf_preview_window.show()
-        self.close()
+    #def PDFPreviewWindow(self):
+    #    self.pdf_preview_window = PDFPreviewWindow(self.image_settings)
+    #    self.pdf_preview_window.show()
+    #    self.close()
 
-class PDFPreviewWindow(QWidget):
-    def __init__(self, image_settings):
+
+class databasePage(QWidget):
+    def __init__(self, *args, **kwargs):
         super().__init__()
-
-        self.image_settings = image_settings
 
         self.setWindowTitle('Menù Impostazioni')
 
         layout = QVBoxLayout()
 
         pdf_preview_button = QPushButton('Preview PDF', self)
-        pdf_preview_button.clicked.connect(self.generate_and_preview_pdf)
 
         layout.addWidget(pdf_preview_button)
-
         self.setLayout(layout)
+        self.show()
+        self.close()
+
+
+#class PDFPreviewWindow(QWidget):
+#    def __init__(self, image_settings):
+#        super().__init__()
+
+#        self.image_settings = image_settings
+
+#        self.setWindowTitle('Menù Impostazioni')
+
+#        layout = QVBoxLayout()
+
+#        pdf_preview_button = QPushButton('Preview PDF', self)
+#        pdf_preview_button.clicked.connect(self.generate_and_preview_pdf)
+
+#        layout.addWidget(pdf_preview_button)
+
+#        self.setLayout(layout)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
