@@ -497,6 +497,7 @@ class databasePage(QWidget):
         self.button = QPushButton('Avanti ->', self)
         self.button.setToolTip('Avanti')
         self.button.move(100,70)
+        self.button.clicked.connect(self.postSelezione(self.tableWidget))
         self.layout.addWidget(self.button)
         
         self.setLayout(self.layout) 
@@ -540,6 +541,9 @@ class databasePage(QWidget):
         self.tableWidget.horizontalHeader().setStretchLastSection(True) 
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         
+    def postSelezione(self, *args, **kwargs):
+        tabellaObj = args[0]
+        print("siopovco")
 
         
 if __name__ == '__main__':
