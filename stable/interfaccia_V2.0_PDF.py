@@ -198,7 +198,9 @@ class MainWindow(QWidget):
             risultato.remove(risultato[0])
             buffer_json[index] = risultato
             
-        databasePage(buffer_json)
+        self.settings_window = databasePage(buffer_json)
+        self.settings_window.show()
+        self.close()
 
     def printPDF(self):
 
@@ -472,48 +474,25 @@ class SettingsWindow(QDialog):
         self.label = QLabel()
         self.image_label.setPixmap(self.im)
 
-    #def generate_image(self):
-    #    paths = []
-
-    #def PDFPreviewWindow(self):
-    #    self.pdf_preview_window = PDFPreviewWindow(self.image_settings)
-    #    self.pdf_preview_window.show()
-    #    self.close()
-
 
 class databasePage(QWidget):
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super().__init__()  
+        self.setWindowTitle('Settings Window')
 
-        self.setWindowTitle('Menù Impostazioni')
+        layout = QHBoxLayout()       
+        settings_groupbox = QGroupBox('Settings')
 
-        layout = QVBoxLayout()
+        form_layout = QFormLayout()
 
-        pdf_preview_button = QPushButton('Preview PDF', self)
+        type_combobox1 = QComboBox(self)
+        type_combobox1.setObjectName('trasporto')
+        type_combobox1.addItems(['Aereo', 'Treno', 'Nave', 'Furgone'])
+        type_combobox1.setCurrentText('ziopera')
+        form_layout.addRow('Shipment Type:', type_combobox1)
+        print("Dovrebbe aprirsi la finestra")
 
-        layout.addWidget(pdf_preview_button)
-        self.setLayout(layout)
-        self.show()
-        self.close()
-
-
-#class PDFPreviewWindow(QWidget):
-#    def __init__(self, image_settings):
-#        super().__init__()
-
-#        self.image_settings = image_settings
-
-#        self.setWindowTitle('Menù Impostazioni')
-
-#        layout = QVBoxLayout()
-
-#        pdf_preview_button = QPushButton('Preview PDF', self)
-#        pdf_preview_button.clicked.connect(self.generate_and_preview_pdf)
-
-#        layout.addWidget(pdf_preview_button)
-
-#        self.setLayout(layout)
-
+        
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     main_window = MainWindow()
