@@ -4,6 +4,7 @@ from PyQt5.QtGui import QPixmap, QImage, QPainter
 from PyQt5 import QtCore
 from PyQt5.QtWebEngineWidgets import QWebEngineSettings, QWebEngineView
 from PyQt5 import QtPrintSupport,QtWidgets
+from PyQt5.QtCore import Qt
 import pandas as pd
 import mysql.connector
 import json
@@ -491,7 +492,7 @@ class databasePage(QWidget):
         self.left = 0
         self.top = 0
         self.width = 800
-        self.height = 850
+        self.height = 930
    
         self.setGeometry(self.left, self.top, self.width, self.height) 
    
@@ -500,13 +501,33 @@ class databasePage(QWidget):
 
    
         self.layout = QVBoxLayout() 
+        
+        self.l2 = QLabel()
+        self.l2.setText("Per selezionare più colonne tenere premuto il tasto Maiusc e allo stesso tempo selezionare le colonne con il mouse")
+        self.l2.move(100,70)
+        self.l2.setAlignment(Qt.AlignCenter)
+        self.l3 = QLabel()
+        self.l3.setText("La selezione a mano di colonne non consecutive verranno considerate consecutive ES[da 1 a 4 consecutive +6 verranno considetate come da 1 a 6]")
+        self.l3.move(100,70)
+        self.l3.setAlignment(Qt.AlignCenter)
+        self.layout.addWidget(self.l2)
+        self.layout.addWidget(self.l3) 
         self.layout.addWidget(self.tableWidget) 
 
         self.Okbutton = QPushButton('Avanti ->', self)
         self.Okbutton.setToolTip('Avanti')
         self.Okbutton.move(100,70)
-        self.Okbutton.clicked.connect(lambda: self.postSelezione(self.tableWidget))
+        self.textbox = QLineEdit(self)
+        self.Okbutton.move(120,70)
+        self.Okbutton.clicked.connect(lambda: self.postSelezione(self.tableWidget,self.textbox))
+        self.l1 = QLabel()
+        self.l1.setText("Nel caso di selezione multipla non consecutiva, inserire a mano le celle desiderate, separate da ','")
+        self.l1.move(100,70)
+        self.l1.setAlignment(Qt.AlignCenter)
+        
         self.layout.addWidget(self.Okbutton)
+        self.layout.addWidget(self.l1)
+        self.layout.addWidget(self.textbox)
         
         self.setLayout(self.layout) 
         #Show window 
@@ -550,13 +571,38 @@ class databasePage(QWidget):
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         
     def postSelezione(self, *args, **kwargs):
+        retDict = {}
+        manSelectedRows = []
+        mouseSelectedRows = []
         tabellaObj = args[0]
+        #totalRowCount = tabellaObj.selectedItems()
+        #for row in totalRowCount:                    #TROVARE LE COLONNE SELEZIONATE
+        #    print(row.isSelected())
+        textFieldObj = args[1]
+        testoImmesso = (((((textFieldObj.text()).replace(' ',',').replace('-',',')).replace(':',',')).replace(';','')).split(sep = ','))
+        for rigaSelezionata in testoImmesso:
+            manSelectedRows.append(rigaSelezionata)
+        retDict['selezioneSingola'] = manSelectedRows
         y = tabellaObj.selectedRanges()
-        y = (y[0]).rowCount()
-        x = (tabellaObj.currentRow()) + 1
-        print((x-y)+1)
-        print(x)
-
+        try:
+            y = (y[0]).rowCount()
+            x = (tabellaObj.currentRow()) + 1
+            
+            rangeStop = ((x-y)+1)
+            rangeStart = (x)
+            if rangeStop <-1:
+                rangeStop = (rangeStop *-1) +2  
+                rowRange = range(rangeStart,rangeStop +1)
+            else:
+                rowRange = range(rangeStop,rangeStart +1)
+            for n in rowRange:
+                mouseSelectedRows.append(n)
+            retDict['selezioneMultipla'] = mouseSelectedRows
+        except IndexError as err:
+            pass
+            
+        print("Risultato: ",retDict)
+        return(retDict) bisogna collegare la funzione che riscagazza i dati alla pagina post selezione csv
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
