@@ -199,8 +199,8 @@ class MainWindow(QWidget):
                 risultato.remove(risultato[0])
                 buffer_json[index] = risultato
                 
-            self.settings_window = databasePage(buffer_json)
-            self.settings_window.show()
+            self.db_window = databasePage(buffer_json)
+            self.db_window.show()
             self.close()
         except mysql.connector.errors.DatabaseError as err:
             msg = QMessageBox()
@@ -346,7 +346,7 @@ class SettingsWindow(QDialog):
             "MXWeight":40
         }
 
-        self.setWindowTitle('Settings Window')
+        self.setWindowTitle('Impostazioni')
 
         layout = QHBoxLayout()       
         settings_groupbox = QGroupBox('Settings')
@@ -486,7 +486,7 @@ class SettingsWindow(QDialog):
 class databasePage(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__()  
-        self.setWindowTitle('Settings Window')
+        self.setWindowTitle('Selezione da DataBase')
 
         self.left = 0
         self.top = 0
@@ -502,11 +502,11 @@ class databasePage(QWidget):
         self.layout = QVBoxLayout() 
         self.layout.addWidget(self.tableWidget) 
 
-        self.button = QPushButton('Avanti ->', self)
-        self.button.setToolTip('Avanti')
-        self.button.move(100,70)
-        #self.button.clicked.connect(self.postSelezione(self.tableWidget))
-        self.layout.addWidget(self.button)
+        self.Okbutton = QPushButton('Avanti ->', self)
+        self.Okbutton.setToolTip('Avanti')
+        self.Okbutton.move(100,70)
+        self.Okbutton.clicked.connect(lambda: self.postSelezione(self.tableWidget))
+        self.layout.addWidget(self.Okbutton)
         
         self.setLayout(self.layout) 
         #Show window 
@@ -551,7 +551,11 @@ class databasePage(QWidget):
         
     def postSelezione(self, *args, **kwargs):
         tabellaObj = args[0]
-        print("siopovco")
+        y = tabellaObj.selectedRanges()
+        y = (y[0]).rowCount()
+        x = (tabellaObj.currentRow()) + 1
+        print((x-y)+1)
+        print(x)
 
         
 if __name__ == '__main__':
