@@ -181,26 +181,34 @@ class MainWindow(QWidget):
         
 
     def show_DB_window(self):
-        mydb = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="eps"
-        )
-        buffer_json = {}
-        mycursor = mydb.cursor()
-        mycursor.execute("SELECT * FROM `pacchi` WHERE 1")
-        myresult = mycursor.fetchall()
-        for risultato in myresult:
-            index = str(risultato[0])
-            buffer_json[index] = ''
-            risultato = list(risultato)
-            risultato.remove(risultato[0])
-            buffer_json[index] = risultato
-            
-        self.settings_window = databasePage(buffer_json)
-        self.settings_window.show()
-        self.close()
+        try:
+            mydb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="eps"
+            )
+            buffer_json = {}
+            mycursor = mydb.cursor()
+            mycursor.execute("SELECT * FROM `pacchi` WHERE 1")
+            myresult = mycursor.fetchall()
+            for risultato in myresult:
+                index = str(risultato[0])
+                buffer_json[index] = ''
+                risultato = list(risultato)
+                risultato.remove(risultato[0])
+                buffer_json[index] = risultato
+                
+            self.settings_window = databasePage(buffer_json)
+            self.settings_window.show()
+            self.close()
+        except mysql.connector.errors.DatabaseError as err:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Errore durante il collegamento al DB")
+            msg.setInformativeText("\nSi è verificata un'eccezione durante il collegamento al database\n\nControllare che l'indirizzo del DataBase sia corretto e che sia raggiungibile\n")
+            msg.setWindowTitle("Errore durante il collegamento al DB")
+            msg.exec_()
 
     def printPDF(self):
 
@@ -497,7 +505,7 @@ class databasePage(QWidget):
         self.button = QPushButton('Avanti ->', self)
         self.button.setToolTip('Avanti')
         self.button.move(100,70)
-        self.button.clicked.connect(self.postSelezione(self.tableWidget))
+        #self.button.clicked.connect(self.postSelezione(self.tableWidget))
         self.layout.addWidget(self.button)
         
         self.setLayout(self.layout) 
