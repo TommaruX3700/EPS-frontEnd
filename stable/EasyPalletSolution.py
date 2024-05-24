@@ -1,9 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QDialog, QFormLayout, QLabel, QComboBox, QLineEdit, QHBoxLayout, QGroupBox, QSizePolicy, QHeaderView, QTableWidgetItem,QTableWidget
-from PyQt5.QtGui import QPixmap, QImage, QPainter
-from PyQt5 import QtCore
-from PyQt5.QtWebEngineWidgets import QWebEngineSettings, QWebEngineView
-from PyQt5 import QtPrintSupport,QtWidgets
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QDialog, QFormLayout, QLabel, QComboBox, QLineEdit, QHBoxLayout, QGroupBox, QHeaderView, QTableWidgetItem,QTableWidget
+from PyQt5.QtGui import QPixmap
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 import pandas as pd
 import mysql.connector
@@ -23,7 +21,6 @@ file_path = ''
 
 def json_updater(json_path,Lenght,Width,Height,MXWeight,Shipment_type):
     if Lenght is None or Width is None or Height is None: # or Shipment_type is None 
-        print('Valori utente non caricati\nDefault Lenght : 120\nWidth : 120\nHeight : 120\nMxWeight : 20\n')
         new_data ={"Shipment_type":"NA",
         "Lenght": 120,
         "Width": 120,
@@ -36,7 +33,6 @@ def json_updater(json_path,Lenght,Width,Height,MXWeight,Shipment_type):
             j.seek(0)
             json.dump(file_data, j, indent = 4)
     else:
-        print('Valori utente caricati\nLenght : {0}\nWidth : {1}\nHeight : {2}\nMax Weight : {3}'.format(Lenght,Width,Height,MXWeight))
         if Shipment_type is None:
             Shipment_type = "NA"
         new_data = new_data ={"Shipment_type":Shipment_type,
@@ -99,10 +95,8 @@ def create_pdf(mainfolder,data):
         strt_line = []
         for linea in buffer:
             if "tabella_dinamica" in linea:
-                print("Da ",buffer.index(linea))
                 strt_line.append(buffer.index(linea))
                 if "'id=\"end_of_tabella_dinamica\">'" in linea:
-                    print("A: ",buffer.index(linea))
                     tt_lines = strt_line[0] - strt_line[1]
                     break
         tt_lines = strt_line[1] - strt_line[0]
@@ -162,8 +156,6 @@ def load_json(file_path):
         data = json.load(file)
     return data
 
-def create_image(rectangles, plane_dimensions):
-    print("bypasscreate_image")
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -291,13 +283,23 @@ class MainWindow(QWidget):
             json_path += 'output.json'
             with open(json_path) as json_file:
                 data = json.load(json_file)
-            print("\nOutput ESP_MODEL.exe: {0}\n".format(data))
+            #print("\nOutput ESP_MODEL.exe: {0}\n".format(data))
+            if data['UnNestedPacks'] is not None:
+                notNestet = ''
+                for pacco in data['UnNestedPacks']:
+                    notNestet += str(pacco)
+                    notNestet += ','
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText("Attenzione")
+                msg.setInformativeText("\nDurante la creazione del pallet alcuni pacchi non sono stati inseriti\n\nQuando dei pacchi non vengono inseriti nel pallet, vuol dire che il pallet è troppo piccolo o già pieno.\n\nPacchi non inseriti: {0}\n".format(notNestet))
+                msg.setWindowTitle("Attenzione")
+                msg.exec_()
             create_pdf(mainfolder,data)
             self.settings_window = SettingsWindow(file_path)
             self.settings_window.show()
             self.close()
         else:
-            #test = kwargs.get('length_edit')
             mainfolder = ''
             config_path = ''
             mainfolder_buff=__file__
@@ -343,12 +345,26 @@ class MainWindow(QWidget):
             json_path += 'output.json'
             with open(json_path) as json_file:
                 data = json.load(json_file)
-            print("\nOutput ESP_MODEL.exe: {0}\n".format(data))
+            #print("\nOutput ESP_MODEL.exe: {0}\n".format(data))
+            if data['UnNestedPacks'] is not None:
+                notNestet = ''
+                for pacco in data['UnNestedPacks']:
+                    notNestet += str(pacco)
+                    notNestet += ','
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText("Attenzione")
+                msg.setInformativeText("\nDurante la creazione del pallet alcuni pacchi non sono stati inseriti\n\nQuando dei pacchi non vengono inseriti nel pallet, vuol dire che il pallet è troppo piccolo o già pieno.\n\nPacchi non inseriti: {0}\n".format(notNestet))
+                msg.setWindowTitle("Attenzione")
+                msg.exec_()
             create_pdf(mainfolder,data)
             self.settings_window = SettingsWindow(csv_file_path=None)
             self.settings_window.show()
             self.close()
 
+    def upload_bubble(self, *args, **kwargs):
+        print("Spedisce la bolla sul db")
+        
 class SettingsWindow(QDialog):
     def __init__(self, csv_file_path):
         super().__init__()  
@@ -411,7 +427,8 @@ class SettingsWindow(QDialog):
 
             pass
         else:
-            print("no")
+            print("Nessun pallet disponibile per la creazione dell'algoritmo di nesting")
+            exit(0)
 
         settings_groupbox.setLayout(form_layout)
 
@@ -437,7 +454,7 @@ class SettingsWindow(QDialog):
         form_layout.addRow(print_button)
 
         writeDB_button = QPushButton('Carica la bolla nel DataBase', self)
-        writeDB_button.clicked.connect(main_window.show_DB_window)#Effettua un insert al database di bitchesgoes
+        writeDB_button.clicked.connect(main_window.upload_bubble)#Effettua un insert al database di bitchesgoes
         form_layout.addRow(writeDB_button)
         
 
@@ -596,9 +613,6 @@ class databasePage(QWidget):
         manSelectedRows = []
         mouseSelectedRows = []
         tabellaObj = args[0]
-        #totalRowCount = tabellaObj.selectedItems()
-        #for row in totalRowCount:                    #TROVARE LE COLONNE SELEZIONATE
-        #    print(row.isSelected())
         textFieldObj = args[1]
         testoImmesso = (((((textFieldObj.text()).replace(' ',',').replace('-',',')).replace(':',',')).replace(';','')).split(sep = ','))
         for rigaSelezionata in testoImmesso:
@@ -624,7 +638,6 @@ class databasePage(QWidget):
             
         colonneSelezionate ={}
         qryRes = args[2]
-        print("Risultato: ",retDict)
         for chiave in retDict:
             for idx in retDict[chiave]:
                 if idx == '':
@@ -649,19 +662,6 @@ class databasePage(QWidget):
             buffer['FLAG_SOVRAPPONIBILE'] = colonneSelezionate[str(chiave)][9]
             buffer['FLAG_RUOTABILE'] = colonneSelezionate[str(chiave)][10]
             json_payload[str(chiave)] = copy.deepcopy(buffer)
-        #"0": {
-        #"NUM_SPEDIZIONE": 17362,
-        #"NUMERO_COLLO": 1,
-        #"CODICE_CLIENTE": 2,
-        #"PESO_NETTO": "40,7",
-        #"PESO_LORDO": "48,7",
-        #"BASE_MAGGIORE": 72,
-        #"BASE_MINORE": 61,
-        #"ALTEZZA": 44,
-        #"FLAG_PALETTIZZABILE": "",
-        #"FLAG_SOVRAPPONIBILE": "",
-        #"FLAG_RUOTABILE": "N"
-        #},
         json_payload["user_settings"] = {
         "Shipment_type": "Aereo",
         "Lenght": 800,
