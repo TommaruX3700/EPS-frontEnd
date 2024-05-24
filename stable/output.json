@@ -3,9 +3,11 @@
         {
             "Packs": [
                 19,
-                7
+                7,
+                85,
+                53
             ],
-            "Pallet": "042704"
+            "Pallet": "221936"
         }
     ],
     "UnNestedPacks": null

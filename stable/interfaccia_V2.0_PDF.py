@@ -57,7 +57,8 @@ def create_pdf(mainfolder,data):
     '''funzione che crea il pdf partendo da un file html'''
     built_pallets={}
     temp_pallet = {}
-    buff_pallet = {}
+    firstRound = True
+    chiavi = []
     n_p=0
     try:
         html_path = mainfolder
@@ -74,7 +75,17 @@ def create_pdf(mainfolder,data):
                 idx += '_'
                 idx += str(i)
                 temp_pallet[idx] = pacco
-                built_pallets[idx] = my_data[str(pacco-1)]
+                try:
+                    built_pallets[idx] = my_data[str(pacco-1)]
+                except Exception:
+                    if firstRound is True:
+                        for chiave in my_data:
+                            if chiave == 'user_settings':
+                                pass
+                            else:
+                                chiavi.append(int(chiave))
+                    firstRound = False
+                    built_pallets[idx] = my_data[str(chiavi[i])]
                 i=i+1
             n_p = n_p+1
 
@@ -310,11 +321,13 @@ class MainWindow(QWidget):
                     Lenght = int((kwargs.get('length_edit')))
                     Width = int((kwargs.get('width_edit')))
                     Height = int((kwargs.get('height_edit')))
-                if kwargs['DBSelection']:
-                    pass
-                else:
+                try:
+                    if kwargs['DBSelection']:
+                        pass
+                    else:
+                        json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
+                except KeyError:
                     json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
-
             json_path = mainfolder
             json_path += config['DEFAULT']['nome_json']
             checkForErrorPath = mainfolder
