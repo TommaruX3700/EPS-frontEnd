@@ -486,6 +486,12 @@ class SettingsWindow(QDialog):
         writeDB_button.clicked.connect(main_window.upload_bubble)#Effettua un insert al database di bitchesgoes
         form_layout.addRow(writeDB_button)
         
+        kill_btn = QPushButton('Indietro',self)
+        kill_btn.clicked.connect(self.goBack)
+        kill_btn.setFixedSize(130,30)
+        form_layout.addRow(kill_btn)
+        
+        
 
 
     def apply_settings_and_show_image(self):
@@ -550,6 +556,9 @@ class SettingsWindow(QDialog):
         self.label = QLabel()
         self.image_label.setPixmap(self.im)
 
+    def goBack(self):
+        self.close()
+        main_window.show()
 
 class databasePage(QWidget):
     def __init__(self, *args, **kwargs):
