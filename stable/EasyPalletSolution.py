@@ -139,13 +139,17 @@ def create_pdf(mainfolder,data):
         bollaPathOut += 'bolla.pdf'
         cssPath = mainfolder
         cssPath += 'Bootstrap\\bootstrap-5.0.2-dist\\css\\bootstrap.css'
+        config_path = mainfolder
+        config_path += 'config.ini'
+        config = configparser.ConfigParser()
+        config.read(config_path)
         jsPath = mainfolder
         jsPath += 'Bootstrap\\bootstrap-5.0.2-dist\\js\\bootstrap.js'
         photoPath = mainfolder
         photoPath += '\\EPS_LOGO_rsz.png'
         template = template_env.get_template('template_bolla.html')
         dt_naive = datetime.now()
-        context={"bootstrap_5_PATH":cssPath,"bootstrapScript_5_PATH":jsPath,"EPS_logo_PATH":photoPath,"nome_cliente":"Mario Rossi","via_cliente": "Via Aldo Moro 24","citt_cliente":"Bologna","naz_cliente":"Italia","cap_cliente":36069,"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M"),"shipm_type":my_data['user_settings']['Shipment_type']}
+        context={"bootstrap_5_PATH":cssPath,"bootstrapScript_5_PATH":jsPath,"EPS_logo_PATH":photoPath,"nome_cliente":str(config.get('RECAPITI','nome')),"via_cliente": str(config.get('RECAPITI','via')),"citt_cliente":str(config.get('RECAPITI','citta')),"naz_cliente":str(config.get('RECAPITI','nazione')),"cap_cliente":int(config.get('RECAPITI','cap')),"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M"),"shipm_type":my_data['user_settings']['Shipment_type']}
         output_text = template.render(context)
         options={"enable-local-file-access": None}
         wkhtmltopdf = mainfolder
@@ -173,18 +177,28 @@ class MainWindow(QWidget):
         upload_button.clicked.connect(self.show_settings_window)
         upload_button.setFixedSize(320, 70)
 
-        seatchDB_button = QPushButton('Recupera collo da DataBase', self)
-        seatchDB_button.clicked.connect(self.show_DB_window)
-        seatchDB_button.setFixedSize(320, 70)
+        searchDB_button = QPushButton('Recupera collo da DataBase', self)
+        searchDB_button.clicked.connect(self.show_DB_window)
+        searchDB_button.setFixedSize(320, 70)
 
-        seatchPLT_DB_button = QPushButton('Recupera pallet da DataBase', self)
-        seatchPLT_DB_button.clicked.connect(self.show_DB_window)
-        seatchPLT_DB_button.setFixedSize(320, 70)
+        searchPLT_DB_button = QPushButton('Recupera pallet da DataBase', self)
+        searchPLT_DB_button.clicked.connect(self.show_DB_window)
+        searchPLT_DB_button.setFixedSize(320, 70)
+        
+        changeUserSettings_button = QPushButton('Impostazioni Utente',self)
+        changeUserSettings_button.clicked.connect(self.changeUsrSettings)
+        changeUserSettings_button.setFixedSize(320, 70)
+        
+        kill_btn = QPushButton('Esci',self)
+        kill_btn.clicked.connect(self.suicide)
+        kill_btn.setFixedSize(130,30)
 
         layout = QVBoxLayout()
         layout.addWidget(upload_button)
-        layout.addWidget(seatchDB_button)
-        layout.addWidget(seatchPLT_DB_button)
+        layout.addWidget(searchDB_button)
+        layout.addWidget(searchPLT_DB_button)
+        layout.addWidget(changeUserSettings_button)
+        layout.addWidget(kill_btn)
 
         self.setLayout(layout)
         
@@ -369,6 +383,16 @@ class MainWindow(QWidget):
 
     def upload_bubble(self, *args, **kwargs):
         print("Spedisce la bolla sul db")
+        
+    
+    def changeUsrSettings(self, *args, **kwargs):
+        self.usrSettings_window = UserSettings()
+        self.usrSettings_window.show()
+        self.close()
+        
+    def suicide(self):
+        self.close()
+        exit(0)
         
 class SettingsWindow(QDialog):
     def __init__(self, csv_file_path):
@@ -681,8 +705,126 @@ class databasePage(QWidget):
         main_window.show_settings_window(askForCSV = False,width_edit = 1200, weight_edit = 40, height_edit = 800, length_edit = 800,shipment_type = 'Aereo',DBSelection = True) #bisogna collegare la funzione che riscagazza i dati alla pagina post selezione csv
         
         
+        
+class UserSettings(QWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__()  
+        self.setWindowTitle('Impostazioni Utente')
+        self.setGeometry(100,100,320,210)
+
+        self.left = 0
+        self.top = 0
+        self.width = 800
+        self.height = 930
+        self.layout = QVBoxLayout() 
+        
+        self.l1 = QLabel()
+        self.l1.setText("Nome e Cognome del Cliente")
+        self.l1.move(100,70)
+        self.l1.setAlignment(Qt.AlignTop)
+        
+        self.l2 = QLabel()
+        self.l2.setText("Via del Cliente")
+        self.l2.move(100,70)
+        self.l2.setAlignment(Qt.AlignTop)
+        
+        self.l3 = QLabel()
+        self.l3.setText("Città di residenza del Cliente")
+        self.l3.move(100,70)
+        self.l3.setAlignment(Qt.AlignTop)
+        
+        self.l4 = QLabel()
+        self.l4.setText("Nazione di residenza del Cliente")
+        self.l4.move(100,70)
+        self.l4.setAlignment(Qt.AlignTop)
+        
+        self.l5 = QLabel()
+        self.l5.setText("CAP di residenza del Cliente")
+        self.l5.move(100,70)
+        self.l5.setAlignment(Qt.AlignTop)
+        
+        
+        
+        self.Okbutton = QPushButton('Applica', self)
+        self.Okbutton.setToolTip('Applica')
+        self.Okbutton.move(100,70)
+        self.Okbutton.clicked.connect(lambda: self.apply(apply = True,nome = self.nome,via = self.via,citta = self.citta, nazione = self.naz, cap = self.cap))
+        
+        self.Nobutton = QPushButton('Annulla', self)
+        self.Nobutton.setToolTip('Annulla')
+        self.Nobutton.clicked.connect(lambda: self.apply(apply = False))
+        self.Nobutton.move(100,70)
+        
+        
+        self.nome = QLineEdit(self)
+        self.nome.resize(400,75)
+        self.layout.addWidget(self.nome)
+        self.layout.addWidget(self.l1)
+        
+        self.via = QLineEdit(self)
+        self.via.resize(400,75)
+        self.layout.addWidget(self.via)
+        self.layout.addWidget(self.l2)
+        
+        self.citta = QLineEdit(self)
+        self.citta.resize(400,75)
+        self.layout.addWidget(self.citta)
+        self.layout.addWidget(self.l3)
+        
+        self.naz = QLineEdit(self)
+        self.naz.resize(400,75)
+        self.layout.addWidget(self.naz)
+        self.layout.addWidget(self.l4)
+        
+        self.cap = QLineEdit(self)
+        self.cap.resize(400,75)
+        self.layout.addWidget(self.cap)
+        self.layout.addWidget(self.l5)
+                
+        self.layout.addWidget(self.Okbutton)
+        self.layout.addWidget(self.Nobutton)
+        
+        self.setLayout(self.layout) 
+        self.show()
+        
+    def apply(self, *args, **kwargs):
+        mainfolder = ''
+        mainfolder_buff=__file__
+        mainfolder_buff = mainfolder_buff.split(sep='\\')
+        mainfolder_buff.pop(-1)
+        for name in mainfolder_buff:
+            mainfolder += name
+            mainfolder += '\\' 
+        config_path = mainfolder
+        config_path += 'config.ini'
+        config = configparser.ConfigParser()
+        config.read(config_path)
+        
+        if kwargs['apply'] is True:
+            nome = kwargs['nome'].text()
+            via = kwargs['via'].text()
+            citta = kwargs['citta'].text()
+            nazione = kwargs['nazione'].text()
+            cap = kwargs['cap'].text()
+            
+            config.set('RECAPITI','nome',str(nome))
+            config.set('RECAPITI','via',str(via))
+            config.set('RECAPITI','citta',str(citta))
+            config.set('RECAPITI','nazione',str(nazione))
+            config.set('RECAPITI','cap',str(cap))
+            config.write(open(config_path, "w"))
+            
+            print("Applicato")
+            self.close()
+            main_window.show()
+        else:
+            pass
+        
+   
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec_())
+    
