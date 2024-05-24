@@ -139,15 +139,20 @@ def create_pdf(mainfolder,data):
         bollaPathOut += 'bolla.pdf'
         cssPath = mainfolder
         cssPath += 'Bootstrap\\bootstrap-5.0.2-dist\\css\\bootstrap.css'
+        jsPath = mainfolder
+        jsPath += 'Bootstrap\\bootstrap-5.0.2-dist\\js\\bootstrap.js'
+        photoPath = mainfolder
+        photoPath += '\\EPS_LOGO_rsz.png'
         template = template_env.get_template('template_bolla.html')
         dt_naive = datetime.now()
-        context={"nome_cliente":"Mario Rossi","via_cliente": "Via Aldo Moro 24","citt_cliente":"Bologna","naz_cliente":"Italia","cap_cliente":36069,"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M"),"shipm_type":my_data['user_settings']['Shipment_type']}
+        context={"bootstrap_5_PATH":cssPath,"bootstrapScript_5_PATH":jsPath,"EPS_logo_PATH":photoPath,"nome_cliente":"Mario Rossi","via_cliente": "Via Aldo Moro 24","citt_cliente":"Bologna","naz_cliente":"Italia","cap_cliente":36069,"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M"),"shipm_type":my_data['user_settings']['Shipment_type']}
         output_text = template.render(context)
-        options={"enable-local-file-access": ""}
+        options={"enable-local-file-access": None}
         wkhtmltopdf = mainfolder
         wkhtmltopdf += 'wkhtmltox\\bin\\wkhtmltopdf.exe'
         pdfConfig = pdfkit.configuration(wkhtmltopdf= wkhtmltopdf)
         pdfkit.from_string(output_text,options=options, output_path=bollaPathOut, configuration=pdfConfig,css=cssPath)
+        #pdfkit.from_file(input='template_bolla.html',options=options, output_path=bollaPathOut, configuration=pdfConfig,css=cssPath)
     except Exception as err:
         print(err)
 

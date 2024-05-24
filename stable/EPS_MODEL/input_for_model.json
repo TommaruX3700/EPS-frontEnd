@@ -442,10 +442,10 @@
         "FLAG_RUOTABILE": ""
     },
     "user_settings": {
-        "Shipment_type": "NA",
-        "Lenght": 120,
+        "Shipment_type": "Aereo",
+        "Lenght": 80,
         "Width": 120,
-        "Height": 120,
-        "MXWeight": 20
+        "Height": 80,
+        "Max Weight": 40
     }
 }
