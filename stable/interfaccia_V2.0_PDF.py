@@ -16,7 +16,7 @@ import jinja2
 import subprocess
 from datetime import datetime
 from PyQt5.QtWidgets import QApplication,QMessageBox
-import qpageview
+import copy
 import fitz
 
 file_path = ''
@@ -286,7 +286,7 @@ class MainWindow(QWidget):
             self.settings_window.show()
             self.close()
         else:
-            test = kwargs.get('length_edit')
+            #test = kwargs.get('length_edit')
             mainfolder = ''
             config_path = ''
             mainfolder_buff=__file__
@@ -302,10 +302,18 @@ class MainWindow(QWidget):
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
                 json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) #bisogna inserire qua i parametri richiesti sulla funziona main 
             else:
-                Lenght = int((kwargs.get('length_edit')).displayText())
-                Width = int((kwargs.get('width_edit')).displayText()) 
-                Height = int((kwargs.get('height_edit')).displayText())
-                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
+                try:
+                    Lenght = int((kwargs.get('length_edit')).displayText())
+                    Width = int((kwargs.get('width_edit')).displayText()) 
+                    Height = int((kwargs.get('height_edit')).displayText())
+                except AttributeError:
+                    Lenght = int((kwargs.get('length_edit')))
+                    Width = int((kwargs.get('width_edit')))
+                    Height = int((kwargs.get('height_edit')))
+                if kwargs['DBSelection']:
+                    pass
+                else:
+                    json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
 
             json_path = mainfolder
             json_path += config['DEFAULT']['nome_json']
@@ -519,7 +527,7 @@ class databasePage(QWidget):
         self.Okbutton.move(100,70)
         self.textbox = QLineEdit(self)
         self.Okbutton.move(120,70)
-        self.Okbutton.clicked.connect(lambda: self.postSelezione(self.tableWidget,self.textbox))
+        self.Okbutton.clicked.connect(lambda: self.postSelezione(self.tableWidget,self.textbox,args[0]))
         self.l1 = QLabel()
         self.l1.setText("Nel caso di selezione multipla non consecutiva, inserire a mano le celle desiderate, separate da ','")
         self.l1.move(100,70)
@@ -601,8 +609,59 @@ class databasePage(QWidget):
         except IndexError as err:
             pass
             
+        colonneSelezionate ={}
+        qryRes = args[2]
         print("Risultato: ",retDict)
-        return(retDict) bisogna collegare la funzione che riscagazza i dati alla pagina post selezione csv
+        for chiave in retDict:
+            for idx in retDict[chiave]:
+                if idx == '':
+                    pass
+                else:
+                    colonneSelezionate[str(idx)] = qryRes[str(idx-1)]
+        self.close()
+        json_payload = {}
+        for chiave in colonneSelezionate:
+            buffer = {}
+            json_payload[str(chiave)] = {}
+            buffer['NUM_SPEDIZIONE'] = colonneSelezionate[str(chiave)][1]
+            buffer['NUM_SPEDIZIONE'] = colonneSelezionate[str(chiave)][1]
+            buffer['NUMERO_COLLO'] = colonneSelezionate[str(chiave)][0]
+            buffer['CODICE_CLIENTE'] = colonneSelezionate[str(chiave)][2]
+            buffer['PESO_NETTO'] = colonneSelezionate[str(chiave)][3]
+            buffer['PESO_LORDO'] = colonneSelezionate[str(chiave)][4]
+            buffer['BASE_MAGGIORE'] = colonneSelezionate[str(chiave)][5]
+            buffer['BASE_MINORE'] = colonneSelezionate[str(chiave)][6]
+            buffer['ALTEZZA'] = colonneSelezionate[str(chiave)][7]
+            buffer['FLAG_PALETTIZZABILE'] = colonneSelezionate[str(chiave)][8]
+            buffer['FLAG_SOVRAPPONIBILE'] = colonneSelezionate[str(chiave)][9]
+            buffer['FLAG_RUOTABILE'] = colonneSelezionate[str(chiave)][10]
+            json_payload[str(chiave)] = copy.deepcopy(buffer)
+        #"0": {
+        #"NUM_SPEDIZIONE": 17362,
+        #"NUMERO_COLLO": 1,
+        #"CODICE_CLIENTE": 2,
+        #"PESO_NETTO": "40,7",
+        #"PESO_LORDO": "48,7",
+        #"BASE_MAGGIORE": 72,
+        #"BASE_MINORE": 61,
+        #"ALTEZZA": 44,
+        #"FLAG_PALETTIZZABILE": "",
+        #"FLAG_SOVRAPPONIBILE": "",
+        #"FLAG_RUOTABILE": "N"
+        #},
+        json_payload["user_settings"] = {
+        "Shipment_type": "Aereo",
+        "Lenght": 800,
+        "Width": 1200,
+        "Height": 800,
+        "Max Weight": 40
+    }
+        jsonPath = os.getcwd()
+        jsonPath += '\\EPS_MODEL\\input_for_model.json'
+        with open(jsonPath,'w') as j:
+            json.dump(json_payload, j, indent = 4)
+        main_window.show_settings_window(askForCSV = False,width_edit = 1200, weight_edit = 40, height_edit = 800, length_edit = 800,shipment_type = 'Aereo',DBSelection = True) #bisogna collegare la funzione che riscagazza i dati alla pagina post selezione csv
+        
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
