@@ -491,8 +491,6 @@ class SettingsWindow(QDialog):
         kill_btn.setFixedSize(130,30)
         form_layout.addRow(kill_btn)
         
-        
-
 
     def apply_settings_and_show_image(self):
         mainfolder = ''
@@ -751,7 +749,6 @@ class UserSettings(QWidget):
         self.l5.setText("CAP di residenza del Cliente")
         self.l5.move(100,70)
         self.l5.setAlignment(Qt.AlignTop)
-        
         
         
         self.Okbutton = QPushButton('Applica', self)
