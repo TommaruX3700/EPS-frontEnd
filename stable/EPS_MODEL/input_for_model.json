@@ -12,45 +12,6 @@
         "FLAG_SOVRAPPONIBILE": "",
         "FLAG_RUOTABILE": "N"
     },
-    "3": {
-        "NUM_SPEDIZIONE": 136,
-        "NUMERO_COLLO": 19,
-        "CODICE_CLIENTE": 1017,
-        "PESO_NETTO": "79",
-        "PESO_LORDO": "94",
-        "BASE_MAGGIORE": 86,
-        "BASE_MINORE": 33,
-        "ALTEZZA": 28,
-        "FLAG_PALETTIZZABILE": "",
-        "FLAG_SOVRAPPONIBILE": "N",
-        "FLAG_RUOTABILE": ""
-    },
-    "4": {
-        "NUM_SPEDIZIONE": 131,
-        "NUMERO_COLLO": 7,
-        "CODICE_CLIENTE": 1029,
-        "PESO_NETTO": "82",
-        "PESO_LORDO": "135",
-        "BASE_MAGGIORE": 97,
-        "BASE_MINORE": 29,
-        "ALTEZZA": 119,
-        "FLAG_PALETTIZZABILE": "",
-        "FLAG_SOVRAPPONIBILE": "N",
-        "FLAG_RUOTABILE": "N"
-    },
-    "5": {
-        "NUM_SPEDIZIONE": 109,
-        "NUMERO_COLLO": 24,
-        "CODICE_CLIENTE": 1025,
-        "PESO_NETTO": "89",
-        "PESO_LORDO": "103",
-        "BASE_MAGGIORE": 73,
-        "BASE_MINORE": 17,
-        "ALTEZZA": 94,
-        "FLAG_PALETTIZZABILE": "N",
-        "FLAG_SOVRAPPONIBILE": "",
-        "FLAG_RUOTABILE": ""
-    },
     "user_settings": {
         "Shipment_type": "Aereo",
         "Lenght": 800,
