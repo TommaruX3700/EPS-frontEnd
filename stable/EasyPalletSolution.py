@@ -308,18 +308,21 @@ class MainWindow(QWidget):
             json_path += config['DEFAULT']['nome_json']
             checkForErrorPath = mainfolder
             checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
-            print("directory output.json: {0}".format(json_path))
             try:
                 checkForError = (subprocess.check_output([checkForErrorPath, str(json_path)]))
             except Exception as err:
-                print("Programma terminato con codice diverso da 0 \nCode: {0}".format(checkForError))
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText("Errore")
+                msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\Errore: {0}\n".format(checkForError))
+                msg.setWindowTitle("Errore Critico")
+                msg.exec_()
                 exit(1)
             
             json_path = mainfolder
             json_path += 'output.json'
             with open(json_path) as json_file:
                 data = json.load(json_file)
-            #print("\nOutput ESP_MODEL.exe: {0}\n".format(data))
             if data['UnNestedPacks'] is not None:
                 notNestet = ''
                 for pacco in data['UnNestedPacks']:
@@ -370,18 +373,21 @@ class MainWindow(QWidget):
             json_path += config['DEFAULT']['nome_json']
             checkForErrorPath = mainfolder
             checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
-            print("path output.json {0}".format(json_path))
             try:
                 checkForError = (subprocess.check_output([checkForErrorPath, str(json_path)]))
             except Exception as err:
-                print("Programma terminato con codice diverso da 0 \nCode: {0}".format(checkForError))
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText("Errore")
+                msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\Errore: {0}\n".format(checkForError))
+                msg.setWindowTitle("Errore Critico")
+                msg.exec_()
                 exit(1)
             
             json_path = mainfolder
             json_path += 'output.json'
             with open(json_path) as json_file:
                 data = json.load(json_file)
-            #print("\nOutput ESP_MODEL.exe: {0}\n".format(data))
             if data['UnNestedPacks'] is not None:
                 notNestet = ''
                 for pacco in data['UnNestedPacks']:
@@ -408,6 +414,7 @@ class MainWindow(QWidget):
         self.close()
         
     def suicide(self):
+        self.destroy()
         self.close()
         exit(0)
         
@@ -836,7 +843,10 @@ class UserSettings(QWidget):
             config.set('RECAPITI','cap',str(cap))
             config.write(open(config_path, "w"))
             
-            print("Applicato")
+            msg = QMessageBox()
+            msg.setWindowTitle("Impostazioni Applicate")
+            msg.setText("Impostazioni applicate correttamente")
+            x = msg.exec_()
             self.close()
             main_window.show()
         else:
