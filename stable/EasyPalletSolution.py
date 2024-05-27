@@ -19,8 +19,20 @@ import fitz
 
 file_path = ''
 
+def mainfolderFinder():
+    '''Trova la cartella attuale'''
+    mainfolder = ''
+    mainfolder_buff=__file__
+    mainfolder_buff = mainfolder_buff.split(sep='\\')
+    mainfolder_buff.pop(-1)
+    for name in mainfolder_buff:
+        mainfolder += name
+        mainfolder += '\\' 
+    
+    return(mainfolder)
+
 def json_updater(json_path,Lenght,Width,Height,MXWeight,Shipment_type):
-    if Lenght is None or Width is None or Height is None: # or Shipment_type is None 
+    if Lenght is None or Width is None or Height is None:
         new_data ={"Shipment_type":"NA",
         "Lenght": 120,
         "Width": 120,
@@ -162,7 +174,6 @@ def create_pdf(mainfolder,data):
         wkhtmltopdf += 'wkhtmltox\\bin\\wkhtmltopdf.exe'
         pdfConfig = pdfkit.configuration(wkhtmltopdf= wkhtmltopdf)
         pdfkit.from_string(output_text,options=options, output_path=bollaPathOut, configuration=pdfConfig,css=cssPath)
-        #pdfkit.from_file(input='template_bolla.html',options=options, output_path=bollaPathOut, configuration=pdfConfig,css=cssPath)
     except Exception as err:
         print(err)
 
@@ -252,14 +263,14 @@ class MainWindow(QWidget):
             file_dialog = QFileDialog()
             file_path, _ = file_dialog.getOpenFileName(self, 'Open CSV File', '', 'CSV files (*.csv)')
             if file_path:
-                mainfolder = ''
+                mainfolder = mainfolderFinder()
                 config_path = ''
-                mainfolder_buff=__file__
-                mainfolder_buff = mainfolder_buff.split(sep='\\')
-                mainfolder_buff.pop(-1)
-                for name in mainfolder_buff:
-                    mainfolder += name
-                    mainfolder += '\\' 
+                #mainfolder_buff=__file__
+                #mainfolder_buff = mainfolder_buff.split(sep='\\')
+                #mainfolder_buff.pop(-1)
+                #for name in mainfolder_buff:
+                #    mainfolder += name
+                #    mainfolder += '\\' 
                 config_path += mainfolder
                 config_path += 'config.ini'
                 config = configparser.ConfigParser()
@@ -281,14 +292,14 @@ class MainWindow(QWidget):
                     self.show_settings_window()
             else:
                 json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
-            mainfolder = ''
+            mainfolder = mainfolderFinder()
             config_path = ''
-            mainfolder_buff=__file__
-            mainfolder_buff = mainfolder_buff.split(sep='\\')
-            mainfolder_buff.pop(-1)
-            for name in mainfolder_buff:
-                mainfolder += name
-                mainfolder += '\\' 
+            #mainfolder_buff=__file__
+            #mainfolder_buff = mainfolder_buff.split(sep='\\')
+            #mainfolder_buff.pop(-1)
+            #for name in mainfolder_buff:
+            #    mainfolder += name
+            #    mainfolder += '\\' 
             config_path += mainfolder
             config_path += 'config.ini'
             config = configparser.ConfigParser()
@@ -325,14 +336,14 @@ class MainWindow(QWidget):
             self.settings_window.show()
             self.close()
         else:
-            mainfolder = ''
+            mainfolder = mainfolderFinder()
             config_path = ''
-            mainfolder_buff=__file__
-            mainfolder_buff = mainfolder_buff.split(sep='\\')
-            mainfolder_buff.pop(-1)
-            for name in mainfolder_buff:
-                mainfolder += name
-                mainfolder += '\\' 
+            #mainfolder_buff=__file__
+            #mainfolder_buff = mainfolder_buff.split(sep='\\')
+            #mainfolder_buff.pop(-1)
+            #for name in mainfolder_buff:
+            #    mainfolder += name
+            #    mainfolder += '\\' 
             config_path += mainfolder
             config_path += 'config.ini'
             config = configparser.ConfigParser()
@@ -499,14 +510,14 @@ class SettingsWindow(QDialog):
         
 
     def apply_settings_and_show_image(self):
-        mainfolder = ''
+        mainfolder = mainfolderFinder()
         config_path = ''
-        mainfolder_buff=__file__
-        mainfolder_buff = mainfolder_buff.split(sep='\\')
-        mainfolder_buff.pop(-1)
-        for name in mainfolder_buff:
-            mainfolder += name
-            mainfolder += '\\' 
+        #mainfolder_buff=__file__
+        #mainfolder_buff = mainfolder_buff.split(sep='\\')
+        #mainfolder_buff.pop(-1)
+        #for name in mainfolder_buff:
+        #    mainfolder += name
+        #    mainfolder += '\\' 
         config_path += mainfolder
         config_path += 'config.ini'
         config = configparser.ConfigParser()
@@ -646,7 +657,6 @@ class databasePage(QWidget):
             self.tableWidget.setItem((int(row)),9, QTableWidgetItem(str((dbResult[row])[9]))) 
             self.tableWidget.setItem((int(row)),10, QTableWidgetItem(str((dbResult[row])[10])))
    
-        #Table will fit the screen horizontally 
         self.tableWidget.horizontalHeader().setStretchLastSection(True) 
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         
@@ -715,7 +725,7 @@ class databasePage(QWidget):
         jsonPath += '\\EPS_MODEL\\input_for_model.json'
         with open(jsonPath,'w') as j:
             json.dump(json_payload, j, indent = 4)
-        main_window.show_settings_window(askForCSV = False,width_edit = 1200, weight_edit = 40, height_edit = 800, length_edit = 800,shipment_type = 'Aereo',DBSelection = True) #bisogna collegare la funzione che riscagazza i dati alla pagina post selezione csv
+        main_window.show_settings_window(askForCSV = False,width_edit = 1200, weight_edit = 40, height_edit = 800, length_edit = 800,shipment_type = 'Aereo',DBSelection = True)
         
         
         
@@ -800,13 +810,13 @@ class UserSettings(QWidget):
         self.show()
         
     def apply(self, *args, **kwargs):
-        mainfolder = ''
-        mainfolder_buff=__file__
-        mainfolder_buff = mainfolder_buff.split(sep='\\')
-        mainfolder_buff.pop(-1)
-        for name in mainfolder_buff:
-            mainfolder += name
-            mainfolder += '\\' 
+        mainfolder = mainfolderFinder()
+        #mainfolder_buff=__file__
+        #mainfolder_buff = mainfolder_buff.split(sep='\\')
+        #mainfolder_buff.pop(-1)
+        #for name in mainfolder_buff:
+        #    mainfolder += name
+        #    mainfolder += '\\' 
         config_path = mainfolder
         config_path += 'config.ini'
         config = configparser.ConfigParser()
