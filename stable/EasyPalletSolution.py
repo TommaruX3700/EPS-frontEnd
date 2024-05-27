@@ -100,12 +100,16 @@ def create_pdf(mainfolder,data):
                     tt_lines = strt_line[0] - strt_line[1]
                     break
         tt_lines = strt_line[1] - strt_line[0]
+        j = 0
         for pallet in built_pallets:
             i=0
             idx = tt_lines -2
             k = strt_line[1]
             stringhe = []
-            stringhe.append('''<tr id="colonna_dinamica">\n''')
+            if j % 2 == 0:
+                stringhe.append('''<tr id="colonna_dinamica">\n''') # 
+            else:
+                stringhe.append('''<tr id="colonna_dinamica" style="background-color:#f7f7da;">\n''')
             stringhe.append('''<th scope="row" style="font-family:\'Serif\'">{0}</th>\n'''.format(str(pallet)))
             stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(built_pallets[str(pallet)]['NUMERO_COLLO']))
             dimensioni = str(built_pallets[str(pallet)]['BASE_MAGGIORE'])
@@ -129,6 +133,8 @@ def create_pdf(mainfolder,data):
                 buffer.insert(k,stringa)
                 k = k + 1
                 i=i+1
+            
+            j = j+1           
 
         with open(html_path,'w') as h:
             h.writelines(buffer)
