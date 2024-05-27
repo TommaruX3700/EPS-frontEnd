@@ -85,7 +85,7 @@ def create_pdf(mainfolder,data):
                 temp_pallet[idx] = pacco
                 try:
                     built_pallets[idx] = my_data[str(pacco-1)]
-                except Exception:
+                except Exception as err:
                     if firstRound is True:
                         for chiave in my_data:
                             if chiave == 'user_settings':
@@ -174,8 +174,20 @@ def create_pdf(mainfolder,data):
         wkhtmltopdf += 'wkhtmltox\\bin\\wkhtmltopdf.exe'
         pdfConfig = pdfkit.configuration(wkhtmltopdf= wkhtmltopdf)
         pdfkit.from_string(output_text,options=options, output_path=bollaPathOut, configuration=pdfConfig,css=cssPath)
+    except TypeError as err:
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setText("Attenzione")
+        msg.setInformativeText("\nL'algoritmo di nesting non è stato in grado di creare il file PDF, in quanto non c'è abbastanza spazio sul pallet\n\nNessun pacco inserito nel file\n")
+        msg.setWindowTitle("Attenzione")
+        msg.exec_()
     except Exception as err:
-        print(err)
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setText("Errore durante a creazione del PDF")
+        msg.setInformativeText("\nSi è verificata un'eccezione durante la creazione del file PDF\n\nAllegare il codice errore agli sviluppatori per correggere l'anomalia\n\nErrore: {0}\n".format(err))
+        msg.setWindowTitle("Errore durante a creazione del PDF")
+        msg.exec_()
 
 def load_json(file_path):
     with open(file_path, 'r') as file:
@@ -375,11 +387,19 @@ class MainWindow(QWidget):
             checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
             try:
                 checkForError = (subprocess.check_output([checkForErrorPath, str(json_path)]))
+            except UnboundLocalError as err:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText("Errore")
+                msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\nErrore: {0}\n".format(err.returncode))
+                msg.setWindowTitle("Errore Critico")
+                msg.exec_()
+                exit(1)
             except Exception as err:
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Critical)
                 msg.setText("Errore")
-                msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\Errore: {0}\n".format(checkForError))
+                msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\nErrore: {0}\n".format(err.returncode))
                 msg.setWindowTitle("Errore Critico")
                 msg.exec_()
                 exit(1)
