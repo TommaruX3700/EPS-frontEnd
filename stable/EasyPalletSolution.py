@@ -84,6 +84,8 @@ def create_pdf(mainfolder,data):
                 try:
                     built_pallets[idx] = my_data[str(idx-1)]
                     built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
+                    built_pallets[idx]['COLORE_GRUPPO'] = int(pallet['Pallet']) *4
+                    built_pallets[idx]['COLORE_GRUPPO'] = hex(built_pallets[idx]['COLORE_GRUPPO'])
                 except Exception as err:
                     if firstRound is True:
                         for chiave in my_data:
@@ -116,29 +118,16 @@ def create_pdf(mainfolder,data):
         j = 0
         indici = []
         for pallet in built_pallets:
-            indicePallet = (built_pallets[int(pallet)]['CODICE_PALLET'])
-            try:
-                indici[1] = indicePallet
-            except IndexError as err:
-                indici.append(indicePallet)
-            try:
-                if indici[0] != indici[1]:
-                    indici[0] = indicePallet
-                    indici[1] = ''
-                elif indici[0] == indici[1]:
-                    print("COPPIA con {0} e {1} ".format(indici[0],indici[1]))
-                    
-            except IndexError as err:
-                indici.append(indicePallet)
                 
+            htmlColor1 = ((built_pallets[int(pallet)]['COLORE_GRUPPO']).replace('0x','#'))
             i=0
             idx = tt_lines -2
             k = strt_line[1]
             stringhe = []
             if j % 2 == 0:
-                stringhe.append('''<tr id="colonna_dinamica">\n''') # 
+                stringhe.append('''<tr id="colonna_dinamica" style="background-color:{0};">\n'''.format(htmlColor1)) # 
             else:
-                stringhe.append('''<tr id="colonna_dinamica" style="background-color:#f7f7da;">\n''')
+                stringhe.append('''<tr id="colonna_dinamica" style="background-color:{0};">\n'''.format(htmlColor1))
                 
             stringhe.append('''<th scope="row" style="font-family:\'Serif\'">{0}</th>\n'''.format(built_pallets[int(pallet)]['CODICE_PALLET']))
             stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(str(pallet)))
