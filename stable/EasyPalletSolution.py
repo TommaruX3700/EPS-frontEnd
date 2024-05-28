@@ -79,12 +79,11 @@ def create_pdf(mainfolder,data):
         for pallet in (data['Pallets']):
             i=0
             for pacco in pallet['Packs']:
-                idx = str(n_p)
-                idx += '_'
-                idx += str(i)
+                idx = pallet['Packs'][i]['id']
                 temp_pallet[idx] = pacco
                 try:
-                    built_pallets[idx] = my_data[str(pacco-1)]
+                    built_pallets[idx] = my_data[str(idx-1)]
+                    built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
                 except Exception as err:
                     if firstRound is True:
                         for chiave in my_data:
@@ -96,6 +95,8 @@ def create_pdf(mainfolder,data):
                     built_pallets[idx] = my_data[str(chiavi[i])]
                 i=i+1
             n_p = n_p+1
+
+        #built_pallets = dict(sorted(built_pallets.items(),reverse=True))
 
         with open(or_html, 'r') as h: #RESET DEL FILE HTML
             orBuff = h.readlines()    #RESET DEL FILE HTML
@@ -113,7 +114,23 @@ def create_pdf(mainfolder,data):
                     break
         tt_lines = strt_line[1] - strt_line[0]
         j = 0
+        indici = []
         for pallet in built_pallets:
+            indicePallet = (built_pallets[int(pallet)]['CODICE_PALLET'])
+            try:
+                indici[1] = indicePallet
+            except IndexError as err:
+                indici.append(indicePallet)
+            try:
+                if indici[0] != indici[1]:
+                    indici[0] = indicePallet
+                    indici[1] = ''
+                elif indici[0] == indici[1]:
+                    print("COPPIA con {0} e {1} ".format(indici[0],indici[1]))
+                    
+            except IndexError as err:
+                indici.append(indicePallet)
+                
             i=0
             idx = tt_lines -2
             k = strt_line[1]
@@ -122,19 +139,20 @@ def create_pdf(mainfolder,data):
                 stringhe.append('''<tr id="colonna_dinamica">\n''') # 
             else:
                 stringhe.append('''<tr id="colonna_dinamica" style="background-color:#f7f7da;">\n''')
-            stringhe.append('''<th scope="row" style="font-family:\'Serif\'">{0}</th>\n'''.format(str(pallet)))
-            stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(built_pallets[str(pallet)]['NUMERO_COLLO']))
-            dimensioni = str(built_pallets[str(pallet)]['BASE_MAGGIORE'])
+                
+            stringhe.append('''<th scope="row" style="font-family:\'Serif\'">{0}</th>\n'''.format(built_pallets[int(pallet)]['CODICE_PALLET']))
+            stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(str(pallet)))
+            dimensioni = str(built_pallets[int(pallet)]['BASE_MAGGIORE'])
             dimensioni += 'x'
-            dimensioni += str(built_pallets[str(pallet)]['BASE_MINORE'])
+            dimensioni += str(built_pallets[int(pallet)]['BASE_MINORE'])
             stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(dimensioni))
-            fr = built_pallets[str(pallet)]['FLAG_RUOTABILE']
+            fr = built_pallets[int(pallet)]['FLAG_RUOTABILE']
             if fr == '':
                 fr = 'No'
             else:
                 fr = 'Yes'
             stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(fr))   
-            fs = built_pallets[str(pallet)]['FLAG_SOVRAPPONIBILE']
+            fs = built_pallets[int(pallet)]['FLAG_SOVRAPPONIBILE']
             if fs == '':
                 fs = 'No'
             else:
