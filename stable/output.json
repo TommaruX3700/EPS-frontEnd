@@ -1,6 +1,16 @@
 {
-    "Pallets": null,
-    "UnNestedPacks": [
-        19
-    ]
+    "FaultedPacks": null,
+    "Pallets": [
+        {
+            "Packs": [
+                {
+                    "id": 19,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "170177"
+        }
+    ],
+    "UnNestedPacks": null
 }
