@@ -4,12 +4,22 @@
         {
             "Packs": [
                 {
+                    "id": 28,
+                    "rf": false,
+                    "rs": true
+                }
+            ],
+            "Pallet": "548225"
+        },
+        {
+            "Packs": [
+                {
                     "id": 19,
                     "rf": true,
                     "rs": true
                 }
             ],
-            "Pallet": "170177"
+            "Pallet": "111777"
         }
     ],
     "UnNestedPacks": null
