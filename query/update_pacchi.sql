@@ -1,30 +1,22 @@
--- UPDATE_PACCHI
+-- UPDATE PACCHI
+-- Da eseguire per ogni singolo pacco processato, aggiornare le variabili soltanto ed eseguire
 
--- eseguire la query solo per un pallet alla volta 
+-- VARIABILE_1: CODICE PALLET A CUI ASSEGNARE I PACCHI
+SET @PALLET_ID = 125;
 
--- 2: se non esiste, lo creo
--- 3: modifico il valore "codice_pallet_assegnato" dei pacchi da caricare con il valore di pallet correlato
+INSERT INTO pallet (CODICE_PALLET_ASSEGNATO)
+SELECT @PALLET_ID
+WHERE NOT EXISTS (SELECT 1 FROM pallet WHERE CODICE_PALLET_ASSEGNATO = @PALLET_ID);
 
-SET @ID = 1;
-SET @PALLET_EXISTS = (SELECT COUNT(1) FROM pallet WHERE pallet.CODICE_PALLET_ASSEGNATO = @ID);
+UPDATE pacchi 
+SET CODICE_PALLET_ASSEGNATO = @PALLET_ID 
+-- VARIABILE_2: CODICI DEI PACCHI DA ASSEGNARE AL PALLET
+WHERE ID_PACCO IN (1, 2, 3);
 
--- DELIMITER //
--- CREATE PROCEDURE procedura1 (param1 INT, param2 CHAR(3),
---        OUT param3 INT)
--- BEGIN
---        DECLARE finito INT default 0;
---        DECLARE a INT;
---        DECLARE b CHAR(50);
--- END; //
--- DELIMITER ;
 
-SELECT 1
-    CASE 
-        WHEN @PALLET_EXISTS = 0 THEN -- query 1
-        ELSE ()
-    END
-    INSERT INTO PA
-FROM pacchi;
 
-SELECT @PALLET_EXISTS;
-
+-- TESTS
+-- OK 1. pacco assegnato a un nuovo pallet id, pallet esistente
+-- FAIL 2. pacco assegnato a un nuovo palelt id, pallet non esistente
+--  PROBABILMENTE È SBAGLIATO IL COSTRAINT DELLA FOREIGN KEY TRA PACCHI E PALLET, E VA INVERTITO
+-- OK 3. pacco assegnato allo stesso pallet id, pallet esistente
