@@ -1153,7 +1153,12 @@ class UserSettings(QWidget):
             self.close()
             main_window.show()
         else:
-            pass
+            msg = QMessageBox()
+            msg.setWindowTitle("Impostazioni non Applicate")
+            msg.setText("Impostazioni non applicate")
+            x = msg.exec_()
+            self.close()
+            main_window.show()
         
    
 
