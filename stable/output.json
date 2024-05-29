@@ -4,72 +4,12 @@
         {
             "Packs": [
                 {
-                    "id": 18,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "351489"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 78,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "311537"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 14,
+                    "id": 29,
                     "rf": false,
                     "rs": true
                 }
             ],
-            "Pallet": "347025"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 19,
-                    "rf": false,
-                    "rs": true
-                }
-            ],
-            "Pallet": "311729"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 33,
-                    "rf": false,
-                    "rs": true
-                }
-            ],
-            "Pallet": "311841"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 76,
-                    "rf": false,
-                    "rs": true
-                }
-            ],
-            "Pallet": "313473"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 79,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "313585"
+            "Pallet": "558977"
         }
     ],
     "UnNestedPacks": null

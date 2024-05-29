@@ -361,12 +361,6 @@ WHERE 1'''
                 json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
             mainfolder = mainfolderFinder()
             config_path = ''
-            #mainfolder_buff=__file__
-            #mainfolder_buff = mainfolder_buff.split(sep='\\')
-            #mainfolder_buff.pop(-1)
-            #for name in mainfolder_buff:
-            #    mainfolder += name
-            #    mainfolder += '\\' 
             config_path += mainfolder
             config_path += 'config.ini'
             config = configparser.ConfigParser()
@@ -377,14 +371,31 @@ WHERE 1'''
             checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
             try:
                 checkForError = (subprocess.check_output([checkForErrorPath, str(json_path)]))
-            except Exception as err:
+            except UnboundLocalError as err:
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Critical)
                 msg.setText("Errore")
-                msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\Errore: {0}\n".format(checkForError))
+                msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\nErrore: {0}\n".format(err.returncode))
                 msg.setWindowTitle("Errore Critico")
                 msg.exec_()
                 exit(1)
+            except Exception as err:
+                if err.returncode == 10:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Errore")
+                    msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nNessun pacco selezionato o i pacchi selezionati sono corrotti\n\nErrore: {0}\n".format(err.returncode))
+                    msg.setWindowTitle("Errore Critico")
+                    msg.exec_()
+                    self.goBack()
+                else:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Errore")
+                    msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\nErrore: {0}\n".format(err.returncode))
+                    msg.setWindowTitle("Errore Critico")
+                    msg.exec_()
+                    exit(1)
             
             json_path = mainfolder
             json_path += 'output.json'
@@ -408,12 +419,6 @@ WHERE 1'''
         else:
             mainfolder = mainfolderFinder()
             config_path = ''
-            #mainfolder_buff=__file__
-            #mainfolder_buff = mainfolder_buff.split(sep='\\')
-            #mainfolder_buff.pop(-1)
-            #for name in mainfolder_buff:
-            #    mainfolder += name
-            #    mainfolder += '\\' 
             config_path += mainfolder
             config_path += 'config.ini'
             config = configparser.ConfigParser()
@@ -451,13 +456,22 @@ WHERE 1'''
                 msg.exec_()
                 exit(1)
             except Exception as err:
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Critical)
-                msg.setText("Errore")
-                msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\nErrore: {0}\n".format(err.returncode))
-                msg.setWindowTitle("Errore Critico")
-                msg.exec_()
-                exit(1)
+                if err.returncode == 10:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Errore")
+                    msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nNessun pacco selezionato o i pacchi selezionati sono corrotti\n\nErrore: {0}\n".format(err.returncode))
+                    msg.setWindowTitle("Errore Critico")
+                    msg.exec_()
+                    self.goBack()
+                else:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Errore")
+                    msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\nErrore: {0}\n".format(err.returncode))
+                    msg.setWindowTitle("Errore Critico")
+                    msg.exec_()
+                    exit(1)
             
             json_path = mainfolder
             json_path += 'output.json'
@@ -492,6 +506,10 @@ WHERE 1'''
         self.destroy()
         self.close()
         exit(0)
+        
+    def goBack(self):
+        self.close()
+        main_window.show()
         
 class SettingsWindow(QDialog):
     def __init__(self, csv_file_path):
@@ -832,18 +850,30 @@ class palletSelection(QWidget):
             print()
                 
         except mysql.connector.errors.DatabaseError as err:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setText("Errore durante il collegamento al DB")
-            msg.setInformativeText("\nSi è verificata un'eccezione durante il collegamento al database\n\nControllare che l'indirizzo del DataBase sia corretto e che sia raggiungibile\n")
-            msg.setWindowTitle("Errore durante il collegamento al DB")
-            msg.exec_()
+            if err.errno == 1064:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText("Errore")
+                msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nNessun pacco selezionato o i pacchi selezionati sono corrotti\n\n")
+                msg.setWindowTitle("Errore Critico")
+                msg.exec_()
+                self.kill()
+            else: 
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText("Errore durante il collegamento al DB")
+                msg.setInformativeText("\nSi è verificata un'eccezione durante il collegamento al database\n\nControllare che l'indirizzo del DataBase sia corretto e che sia raggiungibile\n")
+                msg.setWindowTitle("Errore durante il collegamento al DB")
+                msg.exec_()
 
         
     def goBack(self):
         self.close()
         main_window.show()
-
+    
+    def kill(self):
+        self.close()
+        exit(0)
 
 
 class databasePage(QWidget):
@@ -969,6 +999,14 @@ class databasePage(QWidget):
                 else:
                     idx = int(idx)
                     colonneSelezionate[str(idx)] = qryRes[str(idx-1)]
+        if len(colonneSelezionate) == 0:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Errore")
+            msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nNessun pacco selezionato o i pacchi selezionati sono corrotti\n\n")
+            msg.setWindowTitle("Errore Critico")
+            msg.exec_()
+            self.kill()
         self.close()
         json_payload = {}
         for chiave in colonneSelezionate:
@@ -1003,6 +1041,10 @@ class databasePage(QWidget):
     def goBack(self):
         self.close()
         main_window.show()    
+    
+    def kill(self):
+        self.close()
+        exit(0)
         
 class UserSettings(QWidget):
     def __init__(self, *args, **kwargs):
