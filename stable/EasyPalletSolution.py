@@ -338,12 +338,6 @@ WHERE 1'''
             if file_path:
                 mainfolder = mainfolderFinder()
                 config_path = ''
-                #mainfolder_buff=__file__
-                #mainfolder_buff = mainfolder_buff.split(sep='\\')
-                #mainfolder_buff.pop(-1)
-                #for name in mainfolder_buff:
-                #    mainfolder += name
-                #    mainfolder += '\\' 
                 config_path += mainfolder
                 config_path += 'config.ini'
                 config = configparser.ConfigParser()
@@ -777,14 +771,19 @@ class palletSelection(QWidget):
                 if idx == '':
                     pass
                 else:
-                    colonneSelezionate[str(idx)] = qryRes[str(idx-1)]
+                    idx = int(idx)
+                    colonneSelezionate[str(idx-1)] = qryRes[str(idx-1)]
         self.close()
         
         query = '''SELECT *
         FROM `pacchi`
         WHERE pacchi.CODICE_PALLET_ASSEGNATO IN ('''
-        for codice_pallet_assegato in retDict:
+        i = 0
+        for codice_pallet_assegato in colonneSelezionate:
             query += str(codice_pallet_assegato)
+            if i<((len(colonneSelezionate))-1):
+                query +=','
+            i+=1
         query += ')'
         config_path = mainfolderFinder()
         config_path += 'config.ini'
@@ -801,6 +800,37 @@ class palletSelection(QWidget):
             mycursor = mydb.cursor()
             mycursor.execute(query)
             myresult = mycursor.fetchall()
+            i = 1
+            for collo in myresult:
+                buffer = {}
+                buffer_json[str(i)] = {}
+                buffer['NUM_SPEDIZIONE'] = int(collo[2])
+                buffer['NUMERO_COLLO'] = int(collo[0])
+                buffer['CODICE_CLIENTE'] = int(collo[3])
+                buffer['PESO_NETTO'] = str(collo[4])
+                buffer['PESO_LORDO'] = str(collo[5])
+                buffer['BASE_MAGGIORE'] = int(collo[6])
+                buffer['BASE_MINORE'] = int(collo[7])
+                buffer['ALTEZZA'] = int(collo[8])
+                buffer['FLAG_PALETTIZZABILE'] = str(collo[9])
+                buffer['FLAG_SOVRAPPONIBILE'] = str(collo[10])
+                buffer['FLAG_RUOTABILE'] = str(collo[11])
+                buffer_json[str(i)] = copy.deepcopy(buffer)
+                i+=1
+            buffer_json["user_settings"] = {
+            "Shipment_type": "Aereo",
+            "Lenght": 800,
+            "Width": 1200,
+            "Height": 800,
+            "Max Weight": 40
+        }
+            jsonPath = os.getcwd()
+            jsonPath += '\\EPS_MODEL\\input_for_model.json'
+            with open(jsonPath,'w') as j:
+                json.dump(buffer_json, j, indent = 4)
+            main_window.show_settings_window(askForCSV = False,width_edit = 1200, weight_edit = 40, height_edit = 800, length_edit = 800,shipment_type = 'Aereo',DBSelection = True)
+            print()
+                
         except mysql.connector.errors.DatabaseError as err:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
@@ -937,6 +967,7 @@ class databasePage(QWidget):
                 if idx == '':
                     pass
                 else:
+                    idx = int(idx)
                     colonneSelezionate[str(idx)] = qryRes[str(idx-1)]
         self.close()
         json_payload = {}
