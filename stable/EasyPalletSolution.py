@@ -95,6 +95,9 @@ def create_pdf(mainfolder,data):
                                 chiavi.append(int(chiave))
                     firstRound = False
                     built_pallets[idx] = my_data[str(chiavi[i])]
+                    built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
+                    built_pallets[idx]['COLORE_GRUPPO'] = int(pallet['Pallet']) *4
+                    built_pallets[idx]['COLORE_GRUPPO'] = hex(built_pallets[idx]['COLORE_GRUPPO'])
                 i=i+1
             n_p = n_p+1
 
@@ -214,11 +217,11 @@ class MainWindow(QWidget):
         upload_button.setFixedSize(320, 70)
 
         searchDB_button = QPushButton('Recupera collo da DataBase', self)
-        searchDB_button.clicked.connect(self.show_DB_window)
+        searchDB_button.clicked.connect(self.show_DB_window_collo)
         searchDB_button.setFixedSize(320, 70)
 
         searchPLT_DB_button = QPushButton('Recupera pallet da DataBase', self)
-        searchPLT_DB_button.clicked.connect(self.show_DB_window)
+        searchPLT_DB_button.clicked.connect(self.show_DB_window_pallet)
         searchPLT_DB_button.setFixedSize(320, 70)
         
         changeUserSettings_button = QPushButton('Impostazioni Utente',self)
@@ -238,14 +241,65 @@ class MainWindow(QWidget):
 
         self.setLayout(layout)
         
-
-    def show_DB_window(self):
+        
+    def show_DB_window_pallet(self):
+        mainfolder = mainfolderFinder()
+        config_path = mainfolder
+        config_path += 'config.ini'
+        config = configparser.ConfigParser()
+        config.read(config_path)        
         try:
             mydb = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="",
-            database="eps"
+            host= str(config.get('DB_SETTINGS','db_host')),
+            user=str(config.get('DB_SETTINGS','db_username')),
+            password=str(config.get('DB_SETTINGS','db_password')),
+            database=str(config.get('DB_SETTINGS','db_name')),
+            )
+            buffer_json = {}
+            mycursor = mydb.cursor()
+            query = '''SELECT 
+	CODICE_PALLET_ASSEGNATO AS CODICE_PALLET,
+    DIM_X AS X,
+    DIM_Y AS Y,
+    DIM_Z AS ALTEZZA,
+    (SELECT COUNT(pacchi.ID_PACCO) FROM pacchi WHERE pacchi.CODICE_PALLET_ASSEGNATO = pallet.CODICE_PALLET_ASSEGNATO) AS N_PACCHI
+FROM `pallet` 
+WHERE 1'''
+            mycursor.execute(query)
+            myresult = mycursor.fetchall()
+            for risultato in myresult:
+                index = str(risultato[0])
+                buffer_json[index] = ''
+                risultato = list(risultato)
+                risultato.remove(risultato[0])
+                buffer_json[index] = risultato
+                
+            self.palletSelection = palletSelection(buffer_json)
+            self.palletSelection.show()
+            self.close()
+        except mysql.connector.errors.DatabaseError as err:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Errore durante il collegamento al DB")
+            msg.setInformativeText("\nSi è verificata un'eccezione durante il collegamento al database\n\nControllare che l'indirizzo del DataBase sia corretto e che sia raggiungibile\n")
+            msg.setWindowTitle("Errore durante il collegamento al DB")
+            msg.exec_()
+                
+                
+        
+    def show_DB_window_collo(self):
+        mainfolder = mainfolderFinder()
+        config_path = mainfolder
+        config_path += 'config.ini'
+        config = configparser.ConfigParser()
+        config.read(config_path)    
+        x = str(config.get('DB_SETTINGS','db_password'))    
+        try:
+            mydb = mysql.connector.connect(
+            host= str(config.get('DB_SETTINGS','db_host')),
+            user= str(config.get('DB_SETTINGS','db_username')),
+            password= str(config.get('DB_SETTINGS','db_password')),
+            database= str(config.get('DB_SETTINGS','db_name')),
             )
             buffer_json = {}
             mycursor = mydb.cursor()
@@ -609,11 +663,11 @@ class SettingsWindow(QDialog):
         self.close()
         main_window.show()
 
-class databasePage(QWidget):
+
+class palletSelection(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__()  
-        self.setWindowTitle('Selezione da DataBase')
-
+        self.setWindowTitle('Selezione pallet da DataBase')
         self.left = 0
         self.top = 0
         self.width = 800
@@ -622,9 +676,6 @@ class databasePage(QWidget):
         self.setGeometry(self.left, self.top, self.width, self.height) 
    
         self.createTable(dbResult=args[0]) 
-   
-
-   
         self.layout = QVBoxLayout() 
         
         self.l2 = QLabel()
@@ -639,6 +690,162 @@ class databasePage(QWidget):
         self.layout.addWidget(self.l3) 
         self.layout.addWidget(self.tableWidget) 
 
+        self.backbutton = QPushButton('Indietro <-', self)
+        self.backbutton.setToolTip('Avanti')
+        self.backbutton.move(100,70)
+        self.textbox = QLineEdit(self)
+        self.backbutton.move(120,70)
+        self.backbutton.clicked.connect(self.goBack)
+
+        self.Okbutton = QPushButton('Avanti ->', self)
+        self.Okbutton.setToolTip('Avanti')
+        self.Okbutton.move(100,70)
+        self.textbox = QLineEdit(self)
+        self.Okbutton.move(120,70)
+        self.Okbutton.clicked.connect(lambda: self.postQuery(self.tableWidget,self.textbox,args[0]))
+        
+        self.l1 = QLabel()
+        self.l1.setText("Nel caso di selezione multipla non consecutiva, inserire a mano le celle desiderate, separate da ','")
+        self.l1.move(100,70)
+        self.l1.setAlignment(Qt.AlignCenter)
+        
+        self.layout.addWidget(self.Okbutton)
+        self.layout.addWidget(self.backbutton)
+        self.layout.addWidget(self.l1)
+        self.layout.addWidget(self.textbox)
+        
+        self.setLayout(self.layout) 
+        #Show window 
+        self.show() 
+        
+    def createTable(self,dbResult):
+        self.tableWidget = QTableWidget() 
+        w = QtWidgets.QWidget()
+        grid = QtWidgets.QGridLayout(w)
+        self.tableWidget.setRowCount(len(dbResult))  
+        self.tableWidget.setColumnCount(5) 
+#****************CREAZIONE DELLA TABELLA DINAMICA**************************
+
+        self.tableWidget.setItem(0,0, QTableWidgetItem("CODICE_PALLET"))
+        self.tableWidget.setItem(0,1, QTableWidgetItem("BASE_MAGGIORE")) 
+        self.tableWidget.setItem(0,2, QTableWidgetItem("BASE_MINORE"))
+        self.tableWidget.setItem(0,3, QTableWidgetItem("ALTEZZA"))
+        self.tableWidget.setItem(0,4, QTableWidgetItem("N_PACCHI"))
+        
+        for row in dbResult:
+            self.tableWidget.setItem((int(row)),0, QTableWidgetItem(str(row)))
+            self.tableWidget.setItem((int(row)),1, QTableWidgetItem(str((dbResult[row])[0]))) 
+            self.tableWidget.setItem((int(row)),2, QTableWidgetItem(str((dbResult[row])[1]))) 
+            self.tableWidget.setItem((int(row)),3, QTableWidgetItem(str((dbResult[row])[2]))) 
+            self.tableWidget.setItem((int(row)),4, QTableWidgetItem(str((dbResult[row])[3]))) 
+   
+        self.tableWidget.horizontalHeader().setStretchLastSection(True) 
+        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        
+    def postQuery(self, *args, **kwargs):
+        retDict = {}
+        manSelectedRows = []
+        mouseSelectedRows = []
+        tabellaObj = args[0]
+        textFieldObj = args[1]
+        testoImmesso = (((((textFieldObj.text()).replace(' ',',').replace('-',',')).replace(':',',')).replace(';','')).split(sep = ','))
+        for rigaSelezionata in testoImmesso:
+            manSelectedRows.append(rigaSelezionata)
+        retDict['selezioneSingola'] = manSelectedRows
+        y = tabellaObj.selectedRanges()
+        try:
+            y = (y[0]).rowCount()
+            x = (tabellaObj.currentRow()) + 1
+            
+            rangeStop = ((x-y)+1)
+            rangeStart = (x)
+            if rangeStop <-1:
+                rangeStop = (rangeStop *-1) +2  
+                rowRange = range(rangeStart,rangeStop +1)
+            else:
+                rowRange = range(rangeStop,rangeStart +1)
+            for n in rowRange:
+                mouseSelectedRows.append(n)
+            retDict['selezioneMultipla'] = mouseSelectedRows
+        except IndexError as err:
+            pass
+            
+        colonneSelezionate ={}
+        qryRes = args[2]
+        for chiave in retDict:
+            for idx in retDict[chiave]:
+                if idx == '':
+                    pass
+                else:
+                    colonneSelezionate[str(idx)] = qryRes[str(idx-1)]
+        self.close()
+        
+        query = '''SELECT *
+        FROM `pacchi`
+        WHERE pacchi.CODICE_PALLET_ASSEGNATO IN ('''
+        for codice_pallet_assegato in retDict:
+            query += str(codice_pallet_assegato)
+        query += ')'
+        config_path = mainfolderFinder()
+        config_path += 'config.ini'
+        config = configparser.ConfigParser()
+        config.read(config_path)        
+        try:
+            mydb = mysql.connector.connect(
+            host= str(config.get('DB_SETTINGS','db_host')),
+            user=str(config.get('DB_SETTINGS','db_username')),
+            password=str(config.get('DB_SETTINGS','db_password')),
+            database=str(config.get('DB_SETTINGS','db_name')),
+            )
+            buffer_json = {}
+            mycursor = mydb.cursor()
+            mycursor.execute(query)
+            myresult = mycursor.fetchall()
+        except mysql.connector.errors.DatabaseError as err:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Errore durante il collegamento al DB")
+            msg.setInformativeText("\nSi è verificata un'eccezione durante il collegamento al database\n\nControllare che l'indirizzo del DataBase sia corretto e che sia raggiungibile\n")
+            msg.setWindowTitle("Errore durante il collegamento al DB")
+            msg.exec_()
+
+        
+    def goBack(self):
+        self.close()
+        main_window.show()
+
+
+
+class databasePage(QWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__()  
+        self.setWindowTitle('Selezione colli da DataBase')
+        self.left = 0
+        self.top = 0
+        self.width = 800
+        self.height = 930
+        self.setGeometry(self.left, self.top, self.width, self.height) 
+        self.createTable(dbResult=args[0]) 
+        self.layout = QVBoxLayout() 
+        self.l2 = QLabel()
+        self.l2.setText("Per selezionare più colonne tenere premuto il tasto Maiusc e allo stesso tempo selezionare le colonne con il mouse")
+        self.l2.move(100,70)
+        self.l2.setAlignment(Qt.AlignCenter)
+        self.l3 = QLabel()
+        self.l3.setText("La selezione a mano di colonne non consecutive verranno considerate consecutive ES[da 1 a 4 consecutive +6 verranno considetate come da 1 a 6]")
+        self.l3.move(100,70)
+        self.l3.setAlignment(Qt.AlignCenter)
+        self.layout.addWidget(self.l2)
+        self.layout.addWidget(self.l3) 
+        self.layout.addWidget(self.tableWidget) 
+
+        self.backbutton = QPushButton('Indietro <-', self)
+        self.backbutton.setToolTip('Avanti')
+        self.backbutton.move(100,70)
+        self.textbox = QLineEdit(self)
+        self.backbutton.move(120,70)
+        self.backbutton.clicked.connect(self.goBack)
+
         self.Okbutton = QPushButton('Avanti ->', self)
         self.Okbutton.setToolTip('Avanti')
         self.Okbutton.move(100,70)
@@ -650,6 +857,7 @@ class databasePage(QWidget):
         self.l1.move(100,70)
         self.l1.setAlignment(Qt.AlignCenter)
         
+        self.layout.addWidget(self.backbutton)
         self.layout.addWidget(self.Okbutton)
         self.layout.addWidget(self.l1)
         self.layout.addWidget(self.textbox)
@@ -761,7 +969,9 @@ class databasePage(QWidget):
             json.dump(json_payload, j, indent = 4)
         main_window.show_settings_window(askForCSV = False,width_edit = 1200, weight_edit = 40, height_edit = 800, length_edit = 800,shipment_type = 'Aereo',DBSelection = True)
         
-        
+    def goBack(self):
+        self.close()
+        main_window.show()    
         
 class UserSettings(QWidget):
     def __init__(self, *args, **kwargs):
@@ -844,14 +1054,7 @@ class UserSettings(QWidget):
         self.show()
         
     def apply(self, *args, **kwargs):
-        mainfolder = mainfolderFinder()
-        #mainfolder_buff=__file__
-        #mainfolder_buff = mainfolder_buff.split(sep='\\')
-        #mainfolder_buff.pop(-1)
-        #for name in mainfolder_buff:
-        #    mainfolder += name
-        #    mainfolder += '\\' 
-        config_path = mainfolder
+        config_path = mainfolderFinder()
         config_path += 'config.ini'
         config = configparser.ConfigParser()
         config.read(config_path)
