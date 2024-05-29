@@ -13,8 +13,6 @@ SET CODICE_PALLET_ASSEGNATO = @PALLET_ID
 -- VARIABILE_2: CODICI DEI PACCHI DA ASSEGNARE AL PALLET
 WHERE ID_PACCO IN (1, 2, 3);
 
-
-
 -- TESTS
 -- OK 1. pacco assegnato a un nuovo pallet id, pallet esistente
 -- FAIL 2. pacco assegnato a un nuovo palelt id, pallet non esistente
