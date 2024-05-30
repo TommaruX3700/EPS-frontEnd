@@ -1,4 +1,5 @@
 -- database schema fix
+-- tested and working
 
 CREATE TABLE pallet (
     CODICE_PALLET INT(255) PRIMARY KEY,
@@ -29,10 +30,11 @@ INSERT INTO pallet (CODICE_PALLET, DIM_X_PALLET, DIM_Y_PALLET, DIM_Z_PALLET)
             VALUES (10, 1000, 500, 200),
                     (15, 600, 500, 200);
 
-INSERT INTO pacchi (ID_PACCO, CODICE_PALLET, NUM_SPEDIZIONE, CODICE_CLIENTE, PESO_NETTO, PESO_LORDO, BASE_MAGGIORE, BASE_MINORE, ALTEZZA, FLAG_PALLETTIZZABILE, FLAG_SOVRAPPONIBILE, FLAG_RUOTABILE)
-            VALUES  (1532, 005, 1212, 454, 12, 55, 15, 82, 22, 'N', '', ''),
-                    (5425, 124, 1235, 444, 13, 54, 52, 65, 33, '', 'N', ''),
-                    (5454, 125, 4456, 666, 15, 54, 56, 23, 55, 'N', '', '');
+-- NB: non va specificato il codice pallet!
+INSERT INTO pacchi (ID_PACCO, NUM_SPEDIZIONE, CODICE_CLIENTE, PESO_NETTO, PESO_LORDO, BASE_MAGGIORE, BASE_MINORE, ALTEZZA, FLAG_PALLETTIZZABILE, FLAG_SOVRAPPONIBILE, FLAG_RUOTABILE)
+            VALUES  (1532, 1212, 454, 12, 55, 15, 82, 22, 'N', '', ''),
+                    (5425, 1235, 444, 13, 54, 52, 65, 33, '', 'N', ''),
+                    (5454, 4456, 666, 15, 54, 56, 23, 55, 'N', '', '');
 
 -- re-link packs tests
 UPDATE pacchi
