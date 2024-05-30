@@ -13,7 +13,6 @@ CREATE TABLE pacchi (
 );
 
 -- inserting tests
-
 INSERT INTO pallet (pallet_code, description, location)
 VALUES ('P001', 'Electronics', 'Warehouse 1'),
        ('P002', 'Furniture', 'Warehouse 2');
@@ -24,7 +23,6 @@ VALUES ('P001', 'Laptop', 2.5),
        ('P002', 'Chair', 7.0);
 
 -- re-link packs tests
-
 UPDATE pacchi
 SET pallet_code = 'P002'
 WHERE id = 1;
