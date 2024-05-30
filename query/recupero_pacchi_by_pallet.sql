@@ -1,7 +1,6 @@
 -- SELEZIONE PACCHI A SISTEMA BY PALLET_ID
--- OK, tested
--- NB: fillare le parentesi con gli id dei pallet di cui si vuole recuperare i pacchi collegati
 
 SELECT *
 FROM `pacchi`
-WHERE pacchi.CODICE_PALLET_ASSEGNATO IN (0)
+-- FILLARE NELLE PARENTESI LA LISTA DEGLI ID DEI PALLET PER CUI RECUPERARE I PACCHI, eg: (123, 3414, 15151)
+WHERE pacchi.CODICE_PALLET IN (0)
