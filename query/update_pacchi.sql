@@ -15,6 +15,6 @@ WHERE ID_PACCO IN (1, 2, 3);
 
 -- TESTS
 -- OK 1. pacco assegnato a un nuovo pallet id, pallet esistente
--- FAIL 2. pacco assegnato a un nuovo palelt id, pallet non esistente
---  PROBABILMENTE È SBAGLIATO IL COSTRAINT DELLA FOREIGN KEY TRA PACCHI E PALLET, E VA INVERTITO
+-- OK 2. pacco assegnato a un nuovo palelt id, pallet non esistente
+--  NEED TO FIX MY DATABASE SCHEMA
 -- OK 3. pacco assegnato allo stesso pallet id, pallet esistente
