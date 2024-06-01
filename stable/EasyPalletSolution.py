@@ -174,16 +174,15 @@ def create_pdf(mainfolder,data):
         jsPath = mainfolder
         jsPath += 'Bootstrap\\bootstrap-5.0.2-dist\\js\\bootstrap.js'
         photoPath = mainfolder
-        photoPath += '\\EPS_LOGO_rsz.png'
+        photoPath += 'EPS_LOGO_rsz.png'
         template = template_env.get_template('template_bolla.html')
         dt_naive = datetime.now()
         context={"bootstrap_5_PATH":cssPath,"bootstrapScript_5_PATH":jsPath,"EPS_logo_PATH":photoPath,"nome_cliente":str(config.get('RECAPITI','nome')),"via_cliente": str(config.get('RECAPITI','via')),"citt_cliente":str(config.get('RECAPITI','citta')),"naz_cliente":str(config.get('RECAPITI','nazione')),"cap_cliente":int(config.get('RECAPITI','cap')),"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M"),"shipm_type":my_data['user_settings']['Shipment_type']}
         output_text = template.render(context)
-        options={"enable-local-file-access": None}
         wkhtmltopdf = mainfolder
         wkhtmltopdf += 'wkhtmltox\\bin\\wkhtmltopdf.exe'
         pdfConfig = pdfkit.configuration(wkhtmltopdf= wkhtmltopdf)
-        pdfkit.from_string(output_text,options=options, output_path=bollaPathOut, configuration=pdfConfig,css=cssPath)
+        pdfkit.from_string(output_text,options={"enable-local-file-access": ""}, output_path=bollaPathOut, configuration=pdfConfig,css=cssPath)
     except TypeError as err:
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
