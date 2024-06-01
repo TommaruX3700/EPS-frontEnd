@@ -582,7 +582,6 @@ class SettingsWindow(QDialog):
         apply_button.clicked.connect(lambda: main_window.show_settings_window(width_edit = width_edit,weight_edit = weight_edit,height_edit = height_edit,length_edit = length_edit,askForCSV = False,shipment_type=type_combobox1.currentText()))
         form_layout.addRow(apply_button)
 
-
         print_button = QPushButton('Stampa il documento e mostra anteprima', self)
         print_button.clicked.connect(main_window.printPDF)
         form_layout.addRow(print_button)
@@ -1072,8 +1071,7 @@ class UserSettings(QWidget):
         self.l5.setText("CAP di residenza del Cliente")
         self.l5.move(100,70)
         self.l5.setAlignment(Qt.AlignTop)
-        
-        
+       
         self.Okbutton = QPushButton('Applica', self)
         self.Okbutton.setToolTip('Applica')
         self.Okbutton.move(100,70)
