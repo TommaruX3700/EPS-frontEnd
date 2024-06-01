@@ -67,6 +67,7 @@ def create_pdf(mainfolder,data):
     temp_pallet = {}
     firstRound = True
     chiavi = []
+    chiaviJson = []
     n_p=0
     try:
         html_path = mainfolder
@@ -76,13 +77,24 @@ def create_pdf(mainfolder,data):
         json_path = mainfolder
         json_path += '\EPS_MODEL\input_for_model.json'
         my_data = load_json(json_path)
+        for Jchiave in my_data:
+            if Jchiave == 'user_settings':
+                pass
+            else:
+                chiaviJson.append(Jchiave)
+        t = 0        
         for pallet in (data['Pallets']):
             i=0
             for pacco in pallet['Packs']:
                 idx = pallet['Packs'][i]['id']
                 temp_pallet[idx] = pacco
                 try:
-                    built_pallets[idx] = my_data[str(idx-1)]
+                    for indice in my_data:
+                        if my_data[indice]['NUMERO_COLLO'] == idx:
+                            break
+                        else:
+                            continue
+                    built_pallets[idx] = my_data[indice]
                     built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
                     built_pallets[idx]['COLORE_GRUPPO'] = int(pallet['Pallet']) *4
                     built_pallets[idx]['COLORE_GRUPPO'] = hex(built_pallets[idx]['COLORE_GRUPPO'])
@@ -94,10 +106,11 @@ def create_pdf(mainfolder,data):
                             else:
                                 chiavi.append(int(chiave))
                     firstRound = False
-                    built_pallets[idx] = my_data[str(chiavi[i])]
+                    built_pallets[idx] = my_data[str(chiavi[t])]
                     built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
                     built_pallets[idx]['COLORE_GRUPPO'] = int(pallet['Pallet']) *4
                     built_pallets[idx]['COLORE_GRUPPO'] = hex(built_pallets[idx]['COLORE_GRUPPO'])
+                    t +=1
                 i=i+1
             n_p = n_p+1
 
@@ -207,7 +220,6 @@ def load_json(file_path):
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-
         self.setWindowTitle('Menù Principale')
         self.setGeometry(100, 100, 320, 210)
 
@@ -257,11 +269,11 @@ class MainWindow(QWidget):
             buffer_json = {}
             mycursor = mydb.cursor()
             query = '''SELECT 
-	CODICE_PALLET_ASSEGNATO AS CODICE_PALLET,
-    DIM_X AS X,
-    DIM_Y AS Y,
-    DIM_Z AS ALTEZZA,
-    (SELECT COUNT(pacchi.ID_PACCO) FROM pacchi WHERE pacchi.CODICE_PALLET_ASSEGNATO = pallet.CODICE_PALLET_ASSEGNATO) AS N_PACCHI
+	CODICE_PALLET AS CODICE_PALLET,
+    DIM_X_PALLET AS X,
+    DIM_Y_PALLET AS Y,    
+    DIM_Z_PALLET AS ALTEZZA,
+    (SELECT COUNT(pacchi.ID_PACCO) FROM pacchi WHERE pacchi.CODICE_PALLET = pallet.CODICE_PALLET) AS N_PACCHI
 FROM `pallet` 
 WHERE 1'''
             mycursor.execute(query)
@@ -283,8 +295,7 @@ WHERE 1'''
             msg.setInformativeText("\nSi è verificata un'eccezione durante il collegamento al database\n\nControllare che l'indirizzo del DataBase sia corretto e che sia raggiungibile\n")
             msg.setWindowTitle("Errore durante il collegamento al DB")
             msg.exec_()
-                
-                
+             
         
     def show_DB_window_collo(self):
         mainfolder = mainfolderFinder()
@@ -492,7 +503,7 @@ WHERE 1'''
             self.settings_window.show()
             self.close()
 
-    def upload_bubble(self, *args, **kwargs):
+    def upload_bubble(self,single:bool, *args, **kwargs):
         print("Spedisce la bolla sul db")
         
     
@@ -529,7 +540,6 @@ class SettingsWindow(QDialog):
             "MXWeight":40
         }
 
-        self.setWindowTitle('Impostazioni')
 
         layout = QHBoxLayout()       
         settings_groupbox = QGroupBox('Settings')
@@ -559,21 +569,21 @@ class SettingsWindow(QDialog):
         weight_edit.setObjectName('MXWeight')
 
         
-        type_combobox2 = QComboBox(self)
-        type_combobox2.addItems(['1', '2', '3'])
-        type_combobox2.setObjectName('selezione_pallet')
-        form_layout.addRow('Numero Pallet massimo:', type_combobox2)
-        if isinstance(type_combobox2.currentText(), str) == True:
-            self.selezione_pallet = int(type_combobox2.currentText())
-            if (type_combobox2.currentIndex()) is None:
-                pass
-            else:
-                pass
-
-            pass
-        else:
-            print("Nessun pallet disponibile per la creazione dell'algoritmo di nesting")
-            exit(0)
+        #type_combobox2 = QComboBox(self)
+        #type_combobox2.addItems(['1', '2', '3'])
+        #type_combobox2.setObjectName('selezione_pallet')
+        #form_layout.addRow('Numero Pallet massimo:', type_combobox2)
+        #if isinstance(type_combobox2.currentText(), str) == True:
+        #    self.selezione_pallet = int(type_combobox2.currentText())
+        #    if (type_combobox2.currentIndex()) is None:
+        #        pass
+        #    else:
+        #        pass
+#
+        #    pass
+        #else:
+        #    print("Nessun pallet disponibile per la creazione dell'algoritmo di nesting")
+        #    exit(0)
 
         settings_groupbox.setLayout(form_layout)
 
@@ -611,12 +621,6 @@ class SettingsWindow(QDialog):
     def apply_settings_and_show_image(self):
         mainfolder = mainfolderFinder()
         config_path = ''
-        #mainfolder_buff=__file__
-        #mainfolder_buff = mainfolder_buff.split(sep='\\')
-        #mainfolder_buff.pop(-1)
-        #for name in mainfolder_buff:
-        #    mainfolder += name
-        #    mainfolder += '\\' 
         config_path += mainfolder
         config_path += 'config.ini'
         config = configparser.ConfigParser()
@@ -733,7 +737,7 @@ class palletSelection(QWidget):
         self.tableWidget = QTableWidget() 
         w = QtWidgets.QWidget()
         grid = QtWidgets.QGridLayout(w)
-        self.tableWidget.setRowCount(len(dbResult))  
+        self.tableWidget.setRowCount(len(dbResult)+1)  
         self.tableWidget.setColumnCount(5) 
 #****************CREAZIONE DELLA TABELLA DINAMICA**************************
 
@@ -743,12 +747,18 @@ class palletSelection(QWidget):
         self.tableWidget.setItem(0,3, QTableWidgetItem("ALTEZZA"))
         self.tableWidget.setItem(0,4, QTableWidgetItem("N_PACCHI"))
         
+        i = 1
         for row in dbResult:
-            self.tableWidget.setItem((int(row)),0, QTableWidgetItem(str(row)))
-            self.tableWidget.setItem((int(row)),1, QTableWidgetItem(str((dbResult[row])[0]))) 
-            self.tableWidget.setItem((int(row)),2, QTableWidgetItem(str((dbResult[row])[1]))) 
-            self.tableWidget.setItem((int(row)),3, QTableWidgetItem(str((dbResult[row])[2]))) 
-            self.tableWidget.setItem((int(row)),4, QTableWidgetItem(str((dbResult[row])[3]))) 
+            for elemento in dbResult[row]:
+                if elemento is None:
+                    indice = dbResult[row].index(elemento)
+                    dbResult[row][indice] = 'None'
+            self.tableWidget.setItem((int(i)),0, QTableWidgetItem(str(row)))
+            self.tableWidget.setItem((int(i)),1, QTableWidgetItem(str((dbResult[row])[0]))) 
+            self.tableWidget.setItem((int(i)),2, QTableWidgetItem(str((dbResult[row])[1]))) 
+            self.tableWidget.setItem((int(i)),3, QTableWidgetItem(str((dbResult[row])[2]))) 
+            self.tableWidget.setItem((int(i)),4, QTableWidgetItem(str((dbResult[row])[3]))) 
+            i +=1
    
         self.tableWidget.horizontalHeader().setStretchLastSection(True) 
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -782,19 +792,24 @@ class palletSelection(QWidget):
             pass
             
         colonneSelezionate ={}
+        chiavi = []
+        i = 0
         qryRes = args[2]
+        for chiave in qryRes:
+            chiavi.append(chiave)
         for chiave in retDict:
             for idx in retDict[chiave]:
                 if idx == '':
                     pass
                 else:
                     idx = int(idx)
-                    colonneSelezionate[str(idx-1)] = qryRes[str(idx-1)]
+                    colonneSelezionate[str(chiavi[i])] = qryRes[str(chiavi[i])]
+                    i +=1
         self.close()
         
         query = '''SELECT *
         FROM `pacchi`
-        WHERE pacchi.CODICE_PALLET_ASSEGNATO IN ('''
+        WHERE pacchi.CODICE_PALLET IN ('''
         i = 0
         for codice_pallet_assegato in colonneSelezionate:
             query += str(codice_pallet_assegato)
@@ -821,17 +836,17 @@ class palletSelection(QWidget):
             for collo in myresult:
                 buffer = {}
                 buffer_json[str(i)] = {}
-                buffer['NUM_SPEDIZIONE'] = int(collo[2])
-                buffer['NUMERO_COLLO'] = int(collo[0])
-                buffer['CODICE_CLIENTE'] = int(collo[3])
-                buffer['PESO_NETTO'] = str(collo[4])
-                buffer['PESO_LORDO'] = str(collo[5])
-                buffer['BASE_MAGGIORE'] = int(collo[6])
-                buffer['BASE_MINORE'] = int(collo[7])
-                buffer['ALTEZZA'] = int(collo[8])
-                buffer['FLAG_PALETTIZZABILE'] = str(collo[9])
-                buffer['FLAG_SOVRAPPONIBILE'] = str(collo[10])
-                buffer['FLAG_RUOTABILE'] = str(collo[11])
+                buffer['NUM_SPEDIZIONE'] = int(collo[3])
+                buffer['NUMERO_COLLO'] = int(collo[1])
+                buffer['CODICE_CLIENTE'] = int(collo[4])
+                buffer['PESO_NETTO'] = str(collo[5])
+                buffer['PESO_LORDO'] = str(collo[6])
+                buffer['BASE_MAGGIORE'] = int(collo[7])
+                buffer['BASE_MINORE'] = int(collo[8])
+                buffer['ALTEZZA'] = int(collo[9])
+                buffer['FLAG_PALETTIZZABILE'] = str(collo[10])
+                buffer['FLAG_SOVRAPPONIBILE'] = str(collo[11])
+                buffer['FLAG_RUOTABILE'] = str(collo[12])
                 buffer_json[str(i)] = copy.deepcopy(buffer)
                 i+=1
             buffer_json["user_settings"] = {
@@ -931,22 +946,23 @@ class databasePage(QWidget):
         w = QtWidgets.QWidget()
         grid = QtWidgets.QGridLayout(w)
         self.tableWidget.setRowCount(len(dbResult))  
-        self.tableWidget.setColumnCount(11)           
+        self.tableWidget.setColumnCount(12)           
         
-        self.tableWidget.setItem(0,0, QTableWidgetItem("NUMERO_COLLO")) #corrisponde a ID_PACCO chiave univoca
-        self.tableWidget.setItem(0,1, QTableWidgetItem("NUM_SPEDIZIONE")) 
-        self.tableWidget.setItem(0,2, QTableWidgetItem("CODICE_CLIENTE")) 
-        self.tableWidget.setItem(0,3, QTableWidgetItem("PESO_NETTO")) 
-        self.tableWidget.setItem(0,4, QTableWidgetItem("PESO_LORDO")) 
-        self.tableWidget.setItem(0,5, QTableWidgetItem("BASE_MAGGIORE")) 
-        self.tableWidget.setItem(0,6, QTableWidgetItem("BASE_MINORE"))
-        self.tableWidget.setItem(0,7, QTableWidgetItem("ALTEZZA"))
-        self.tableWidget.setItem(0,8, QTableWidgetItem("FLAG_PALETTIZZABILE"))
-        self.tableWidget.setItem(0,9, QTableWidgetItem("FLAG_SOVRAPPONIBILE"))
-        self.tableWidget.setItem(0,10, QTableWidgetItem("FLAG_RUOTABILE"))
+        self.tableWidget.setItem(0,0, QTableWidgetItem("ID_PACCO")) #corrisponde a ID_PACCO chiave univoca
+        self.tableWidget.setItem(0,1, QTableWidgetItem("CODICE_PALLET")) 
+        self.tableWidget.setItem(0,2, QTableWidgetItem("NUMERO_SPEDIZIONE")) 
+        self.tableWidget.setItem(0,3, QTableWidgetItem("CODICE_CLIENTE")) 
+        self.tableWidget.setItem(0,4, QTableWidgetItem("PESO_NETTO")) 
+        self.tableWidget.setItem(0,5, QTableWidgetItem("PESO_LORDO")) 
+        self.tableWidget.setItem(0,6, QTableWidgetItem("BASE_MAGGIORE"))
+        self.tableWidget.setItem(0,7, QTableWidgetItem("BASE_MINORE"))
+        self.tableWidget.setItem(0,8, QTableWidgetItem("ALTEZZA"))
+        self.tableWidget.setItem(0,9, QTableWidgetItem("FLAG_PALLETTIZZABILE"))
+        self.tableWidget.setItem(0,10, QTableWidgetItem("FLAG_SOVRAPPONIBILE"))
+        self.tableWidget.setItem(0,11, QTableWidgetItem("FLAG_RUOTABILE"))
         
         for row in dbResult:
-            self.tableWidget.setItem((int(row)),0, QTableWidgetItem(str(row)))
+            self.tableWidget.setItem((int(row)),0, QTableWidgetItem(str(dbResult[row][0])))
             self.tableWidget.setItem((int(row)),1, QTableWidgetItem(str((dbResult[row])[1]))) 
             self.tableWidget.setItem((int(row)),2, QTableWidgetItem(str((dbResult[row])[2]))) 
             self.tableWidget.setItem((int(row)),3, QTableWidgetItem(str((dbResult[row])[3]))) 
@@ -957,6 +973,7 @@ class databasePage(QWidget):
             self.tableWidget.setItem((int(row)),8, QTableWidgetItem(str((dbResult[row])[8]))) 
             self.tableWidget.setItem((int(row)),9, QTableWidgetItem(str((dbResult[row])[9]))) 
             self.tableWidget.setItem((int(row)),10, QTableWidgetItem(str((dbResult[row])[10])))
+            self.tableWidget.setItem((int(row)),11, QTableWidgetItem(str((dbResult[row])[11])))
    
         self.tableWidget.horizontalHeader().setStretchLastSection(True) 
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -997,7 +1014,7 @@ class databasePage(QWidget):
                     pass
                 else:
                     idx = int(idx)
-                    colonneSelezionate[str(idx)] = qryRes[str(idx-1)]
+                    colonneSelezionate[str(idx-1)] = qryRes[str(idx-1)]
         if len(colonneSelezionate) == 0:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
@@ -1011,18 +1028,17 @@ class databasePage(QWidget):
         for chiave in colonneSelezionate:
             buffer = {}
             json_payload[str(chiave)] = {}
-            buffer['NUM_SPEDIZIONE'] = colonneSelezionate[str(chiave)][1]
-            buffer['NUM_SPEDIZIONE'] = colonneSelezionate[str(chiave)][1]
+            buffer['NUM_SPEDIZIONE'] = colonneSelezionate[str(chiave)][2]
             buffer['NUMERO_COLLO'] = colonneSelezionate[str(chiave)][0]
-            buffer['CODICE_CLIENTE'] = colonneSelezionate[str(chiave)][2]
-            buffer['PESO_NETTO'] = colonneSelezionate[str(chiave)][3]
-            buffer['PESO_LORDO'] = colonneSelezionate[str(chiave)][4]
-            buffer['BASE_MAGGIORE'] = colonneSelezionate[str(chiave)][5]
-            buffer['BASE_MINORE'] = colonneSelezionate[str(chiave)][6]
-            buffer['ALTEZZA'] = colonneSelezionate[str(chiave)][7]
-            buffer['FLAG_PALETTIZZABILE'] = colonneSelezionate[str(chiave)][8]
-            buffer['FLAG_SOVRAPPONIBILE'] = colonneSelezionate[str(chiave)][9]
-            buffer['FLAG_RUOTABILE'] = colonneSelezionate[str(chiave)][10]
+            buffer['CODICE_CLIENTE'] = colonneSelezionate[str(chiave)][3]
+            buffer['PESO_NETTO'] = colonneSelezionate[str(chiave)][4]
+            buffer['PESO_LORDO'] = colonneSelezionate[str(chiave)][5]
+            buffer['BASE_MAGGIORE'] = colonneSelezionate[str(chiave)][6]
+            buffer['BASE_MINORE'] = colonneSelezionate[str(chiave)][7]
+            buffer['ALTEZZA'] = colonneSelezionate[str(chiave)][8]
+            buffer['FLAG_PALETTIZZABILE'] = colonneSelezionate[str(chiave)][9]
+            buffer['FLAG_SOVRAPPONIBILE'] = colonneSelezionate[str(chiave)][10]
+            buffer['FLAG_RUOTABILE'] = colonneSelezionate[str(chiave)][11]
             json_payload[str(chiave)] = copy.deepcopy(buffer)
         json_payload["user_settings"] = {
         "Shipment_type": "Aereo",
