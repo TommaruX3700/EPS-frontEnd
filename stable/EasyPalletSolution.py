@@ -988,7 +988,11 @@ class databasePage(QWidget):
                     pass
                 else:
                     idx = int(idx)
-                    colonneSelezionate[str(idx-1)] = qryRes[str(idx-1)]
+                    try:
+                        test = qryRes[str(idx-1)]
+                        colonneSelezionate[str(idx-1)] = qryRes[str(idx-1)]
+                    except KeyError:
+                        pass
         if len(colonneSelezionate) == 0:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
