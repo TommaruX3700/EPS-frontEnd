@@ -114,12 +114,10 @@ def create_pdf(mainfolder,data):
                 i=i+1
             n_p = n_p+1
 
-        #built_pallets = dict(sorted(built_pallets.items(),reverse=True))
-
-        with open(or_html, 'r') as h: #RESET DEL FILE HTML
-            orBuff = h.readlines()    #RESET DEL FILE HTML
-        with open(html_path, 'w') as h:#RESET DEL FILE HTML
-            h.writelines(orBuff)      #RESET DEL FILE HTML
+        with open(or_html, 'r') as h:
+            orBuff = h.readlines()
+        with open(html_path, 'w') as h:
+            h.writelines(orBuff)
 
         with open(html_path, 'r') as h:
             buffer = h.readlines()
@@ -352,13 +350,12 @@ WHERE 1'''
                 config_path += 'config.ini'
                 config = configparser.ConfigParser()
                 config.read(config_path)
-                #BISOGNA FARE LA SELEZIONE DA DATABASE E QUI CARICARE I DATI CHE NORMALMENTE SI SAREBBERO PRESI DAL CSV
                 uscita= pd.read_csv(file_path, delimiter=";",usecols=["NUM_SPEDIZIONE","NUMERO_COLLO","CODICE_CLIENTE","PESO_NETTO","PESO_LORDO","BASE_MAGGIORE","BASE_MINORE","ALTEZZA","FLAG_PALETTIZZABILE","FLAG_SOVRAPPONIBILE","FLAG_RUOTABILE"])
                 uscita= uscita.fillna("")
                 uscita.to_json(config['DEFAULT']['nome_json'],orient='index', indent=4)
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
                 try:
-                    json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) #bisogna inserire qua i parametri richiesti sulla funziona main 
+                    json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None)
                 except UnboundLocalError as err:
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Critical)
@@ -434,7 +431,7 @@ WHERE 1'''
             config = configparser.ConfigParser()
             config.read(config_path)
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
-                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) #bisogna inserire qua i parametri richiesti sulla funziona main 
+                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) 
             else:
                 try:
                     Lenght = int((kwargs.get('length_edit')).displayText())
@@ -568,26 +565,8 @@ class SettingsWindow(QDialog):
         form_layout.addRow('Max Weight:', weight_edit)
         weight_edit.setObjectName('MXWeight')
 
-        
-        #type_combobox2 = QComboBox(self)
-        #type_combobox2.addItems(['1', '2', '3'])
-        #type_combobox2.setObjectName('selezione_pallet')
-        #form_layout.addRow('Numero Pallet massimo:', type_combobox2)
-        #if isinstance(type_combobox2.currentText(), str) == True:
-        #    self.selezione_pallet = int(type_combobox2.currentText())
-        #    if (type_combobox2.currentIndex()) is None:
-        #        pass
-        #    else:
-        #        pass
-#
-        #    pass
-        #else:
-        #    print("Nessun pallet disponibile per la creazione dell'algoritmo di nesting")
-        #    exit(0)
-
         settings_groupbox.setLayout(form_layout)
 
-        # Image Preview
         image_preview_groupbox = QGroupBox('PDF Preview')
         self.image_label = QLabel(self)
         self.update_image_preview()
@@ -605,11 +584,11 @@ class SettingsWindow(QDialog):
 
 
         print_button = QPushButton('Stampa il documento e mostra anteprima', self)
-        print_button.clicked.connect(main_window.printPDF)#DEVE CHIAMARE LA FUNZIONE DI STAMPA DI SISTEMA
+        print_button.clicked.connect(main_window.printPDF)
         form_layout.addRow(print_button)
 
         writeDB_button = QPushButton('Carica la bolla nel DataBase', self)
-        writeDB_button.clicked.connect(main_window.upload_bubble)#Effettua un insert al database di bitchesgoes
+        writeDB_button.clicked.connect(main_window.upload_bubble)
         form_layout.addRow(writeDB_button)
         
         kill_btn = QPushButton('Indietro',self)
@@ -656,12 +635,11 @@ class SettingsWindow(QDialog):
     def update_image_preview(self):
         pdf = (self.root).replace("\\","/")
         super().__init__()
-       #("/images_output/output_image{0}.png".format(self.selezione_pallet))
         pdf += '/bolla.pdf'
         doc = fitz.open(pdf)
         for i, page in enumerate(doc):
             image = (self.root).replace("\\","/")
-            pix = page.get_pixmap()  # render page to an image
+            pix = page.get_pixmap()
             image += "/bolla"
             image += str(i)
             image += ".png"
@@ -730,7 +708,6 @@ class palletSelection(QWidget):
         self.layout.addWidget(self.textbox)
         
         self.setLayout(self.layout) 
-        #Show window 
         self.show() 
         
     def createTable(self,dbResult):
@@ -937,10 +914,8 @@ class databasePage(QWidget):
         self.layout.addWidget(self.textbox)
         
         self.setLayout(self.layout) 
-        #Show window 
         self.show() 
    
-    #Create table 
     def createTable(self,dbResult): 
         self.tableWidget = QTableWidget() 
         w = QtWidgets.QWidget()
@@ -948,7 +923,7 @@ class databasePage(QWidget):
         self.tableWidget.setRowCount(len(dbResult))  
         self.tableWidget.setColumnCount(12)           
         
-        self.tableWidget.setItem(0,0, QTableWidgetItem("ID_PACCO")) #corrisponde a ID_PACCO chiave univoca
+        self.tableWidget.setItem(0,0, QTableWidgetItem("ID_PACCO"))
         self.tableWidget.setItem(0,1, QTableWidgetItem("CODICE_PALLET")) 
         self.tableWidget.setItem(0,2, QTableWidgetItem("NUMERO_SPEDIZIONE")) 
         self.tableWidget.setItem(0,3, QTableWidgetItem("CODICE_CLIENTE")) 
@@ -1174,8 +1149,7 @@ class UserSettings(QWidget):
             x = msg.exec_()
             self.close()
             main_window.show()
-        
-   
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
