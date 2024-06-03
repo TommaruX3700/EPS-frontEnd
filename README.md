@@ -21,6 +21,8 @@ OUTPUT | model.exe:
     nPallet, #codicePacco2, posX, posY, flagRuotato;
     ...
 
+---
+
 ## LICENSE
 ```
                     GNU GENERAL PUBLIC LICENSE
