@@ -65,6 +65,7 @@ def create_pdf(mainfolder,data):
     '''funzione che crea il pdf partendo da un file html'''
     global built_pallets
     built_pallets={}
+    colori = {}
     temp_pallet = {}
     firstRound = True
     chiavi = []
@@ -97,8 +98,20 @@ def create_pdf(mainfolder,data):
                             continue
                     built_pallets[idx] = my_data[indice]
                     built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
-                    built_pallets[idx]['COLORE_GRUPPO'] = int(pallet['Pallet']) *4
+                    built_pallets[idx]['COLORE_GRUPPO'] = built_pallets[idx]['CODICE_PALLET'] *12
+                    while built_pallets[idx]['COLORE_GRUPPO'] >= 255:
+                        built_pallets[idx]['COLORE_GRUPPO'] = int(built_pallets[idx]['COLORE_GRUPPO'] /12)
+                    try:
+                        if built_pallets[idx]['COLORE_GRUPPO'] == colori[idx]:
+                            while built_pallets[idx]['COLORE_GRUPPO'] < 255:
+                                built_pallets[idx]['COLORE_GRUPPO'] = built_pallets[idx]['COLORE_GRUPPO'] *8
+                                colori[idx] = (built_pallets[idx]['COLORE_GRUPPO'])
+                        else:
+                            colori[idx] = (built_pallets[idx]['COLORE_GRUPPO'])
+                    except KeyError:
+                        colori[idx] = (built_pallets[idx]['COLORE_GRUPPO'])
                     built_pallets[idx]['COLORE_GRUPPO'] = hex(built_pallets[idx]['COLORE_GRUPPO'])
+                
                 except Exception as err:
                     if firstRound is True:
                         for chiave in my_data:
@@ -109,7 +122,10 @@ def create_pdf(mainfolder,data):
                     firstRound = False
                     built_pallets[idx] = my_data[str(chiavi[t])]
                     built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
-                    built_pallets[idx]['COLORE_GRUPPO'] = int(pallet['Pallet']) *4
+                    built_pallets[idx]['COLORE_GRUPPO'] = built_pallets[idx]['CODICE_PALLET'] *12
+                    while built_pallets[idx]['COLORE_GRUPPO'] >= 255:
+                        built_pallets[idx]['COLORE_GRUPPO'] = int(built_pallets[idx]['COLORE_GRUPPO'] /12)
+                    built_pallets[idx]['COLORE_GRUPPO'] = int(built_pallets[idx]['COLORE_GRUPPO'] +15)
                     built_pallets[idx]['COLORE_GRUPPO'] = hex(built_pallets[idx]['COLORE_GRUPPO'])
                     t +=1
                 i=i+1
@@ -135,6 +151,8 @@ def create_pdf(mainfolder,data):
         for pallet in built_pallets:
                 
             htmlColor1 = ((built_pallets[int(pallet)]['COLORE_GRUPPO']).replace('0x','#'))
+            while len(htmlColor1) <= 6:
+                htmlColor1 += '0'
             i=0
             idx = tt_lines -2
             k = strt_line[1]
@@ -277,6 +295,7 @@ FROM `pallet`
 WHERE 1'''
             mycursor.execute(query)
             myresult = mycursor.fetchall()
+            mydb.close()
             for risultato in myresult:
                 index = str(risultato[0])
                 buffer_json[index] = ''
@@ -314,6 +333,7 @@ WHERE 1'''
             mycursor = mydb.cursor()
             mycursor.execute("SELECT * FROM `pacchi` WHERE 1")
             myresult = mycursor.fetchall()
+            mydb.close()
             for risultato in myresult:
                 index = str(risultato[0])
                 buffer_json[index] = ''
@@ -502,18 +522,110 @@ WHERE 1'''
             self.close()
 
     def upload_bubble(self,single:bool, *args, **kwargs):
-        query = '''SELECT *
-        FROM `pacchi`
-        WHERE pacchi.CODICE_PALLET IN ('''
-        i = 0
-        for codice_pallet_assegato in colonneSelezionate:
-            query += str(codice_pallet_assegato)
-            if i<((len(colonneSelezionate))-1):
-                query +=','
-            i+=1
-        query += ')'
-        print("Spedisce la bolla sul db")
+        pass_flag = False
+        codici_pallet = []
+        colli = []
+        pallet = {}
+        for id_collo in built_pallets:
+            obj = built_pallets[id_collo]
+            try:
+                pallet[obj['CODICE_PALLET']].append(obj['NUMERO_COLLO'])
+            except KeyError:
+                pallet[obj['CODICE_PALLET']] = []
+                pallet[obj['CODICE_PALLET']].append(obj['NUMERO_COLLO'])
         
+        for palletID in pallet:
+            
+            query = '''INSERT INTO pallet (CODICE_PALLET)
+            SELECT {0}
+            WHERE NOT EXISTS (SELECT 1 FROM pallet WHERE CODICE_PALLET = {0});
+            '''.format(str(palletID))
+            
+            config_path = mainfolderFinder()
+            config_path += 'config.ini'
+            config = configparser.ConfigParser()
+            config.read(config_path)   
+            try:
+                mydb = mysql.connector.connect(
+                host= str(config.get('DB_SETTINGS','db_host')),
+                user=str(config.get('DB_SETTINGS','db_username')),
+                password=str(config.get('DB_SETTINGS','db_password')),
+                database=str(config.get('DB_SETTINGS','db_name')),
+                )
+                print(query)
+                mycursor = mydb.cursor()
+                mycursor.execute(query)
+                mydb.commit()
+                mycursor.close()
+            except mysql.connector.errors.DatabaseError as err:
+                if err.errno == 1064:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Errore")
+                    msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nNessun pacco selezionato o i pacchi selezionati sono corrotti\n\n")
+                    msg.setWindowTitle("Errore Critico")
+                    msg.exec_()
+                    self.kill()
+                    break
+                else: 
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Errore durante il collegamento al DB")
+                    msg.setInformativeText("\nSi è verificata un'eccezione durante il collegamento al database\n\nControllare che l'indirizzo del DataBase sia corretto e che sia raggiungibile\n")
+                    msg.setWindowTitle("Errore durante il collegamento al DB")
+                    msg.exec_()
+                    break
+                
+            query = """UPDATE pacchi 
+            SET CODICE_PALLET = {0}
+            WHERE ID_PACCO IN (""".format(str(palletID))
+            i = 0
+            for packID in pallet[palletID]:
+                query += str(packID)
+                if i<((len(pallet[palletID]))-1):
+                    query +=','
+                i+=1
+            query += ');'
+            
+            config_path = mainfolderFinder()
+            config_path += 'config.ini'
+            config = configparser.ConfigParser()
+            config.read(config_path)   
+            try:
+                mydb = mysql.connector.connect(
+                host= str(config.get('DB_SETTINGS','db_host')),
+                user=str(config.get('DB_SETTINGS','db_username')),
+                password=str(config.get('DB_SETTINGS','db_password')),
+                database=str(config.get('DB_SETTINGS','db_name')),
+                )
+                print(query)
+                mycursor = mydb.cursor()
+                mycursor.execute(query)
+                mydb.commit()
+                mycursor.close()
+            except mysql.connector.errors.DatabaseError as err:
+                if err.errno == 1064:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Errore")
+                    msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nNessun pacco selezionato o i pacchi selezionati sono corrotti\n\n")
+                    msg.setWindowTitle("Errore Critico")
+                    msg.exec_()
+                    self.kill()
+                    break
+                else: 
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Errore durante il collegamento al DB")
+                    msg.setInformativeText("\nSi è verificata un'eccezione durante il collegamento al database\n\nControllare che l'indirizzo del DataBase sia corretto e che sia raggiungibile\n")
+                    msg.setWindowTitle("Errore durante il collegamento al DB")
+                    msg.exec_()
+                    break
+        
+    def kill(self):
+        self.close()
+        exit(0)
+    
     
     def changeUsrSettings(self, *args, **kwargs):
         self.usrSettings_window = UserSettings()
@@ -821,6 +933,7 @@ class palletSelection(QWidget):
             mycursor = mydb.cursor()
             mycursor.execute(query)
             myresult = mycursor.fetchall()
+            mydb.close()
             i = 1
             for collo in myresult:
                 buffer = {}
