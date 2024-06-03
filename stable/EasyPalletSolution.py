@@ -63,6 +63,7 @@ def json_updater(json_path,Lenght,Width,Height,MXWeight,Shipment_type):
 
 def create_pdf(mainfolder,data):
     '''funzione che crea il pdf partendo da un file html'''
+    global built_pallets
     built_pallets={}
     temp_pallet = {}
     firstRound = True
@@ -501,6 +502,16 @@ WHERE 1'''
             self.close()
 
     def upload_bubble(self,single:bool, *args, **kwargs):
+        query = '''SELECT *
+        FROM `pacchi`
+        WHERE pacchi.CODICE_PALLET IN ('''
+        i = 0
+        for codice_pallet_assegato in colonneSelezionate:
+            query += str(codice_pallet_assegato)
+            if i<((len(colonneSelezionate))-1):
+                query +=','
+            i+=1
+        query += ')'
         print("Spedisce la bolla sul db")
         
     
@@ -519,7 +530,7 @@ WHERE 1'''
         main_window.show()
         
 class SettingsWindow(QDialog):
-    def __init__(self, csv_file_path):
+    def __init__(self, csv_file_path, *args, **kwargs):
         super().__init__()  
         self.setWindowTitle('Menù Impostazioni')
 
@@ -586,6 +597,8 @@ class SettingsWindow(QDialog):
         print_button.clicked.connect(main_window.printPDF)
         form_layout.addRow(print_button)
 
+        main_window.close()
+        
         writeDB_button = QPushButton('Carica la bolla nel DataBase', self)
         writeDB_button.clicked.connect(main_window.upload_bubble)
         form_layout.addRow(writeDB_button)
