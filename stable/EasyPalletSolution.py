@@ -100,11 +100,11 @@ def create_pdf(mainfolder,data):
                     built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
                     built_pallets[idx]['COLORE_GRUPPO'] = built_pallets[idx]['CODICE_PALLET'] *12
                     while built_pallets[idx]['COLORE_GRUPPO'] >= 255:
-                        built_pallets[idx]['COLORE_GRUPPO'] = int(built_pallets[idx]['COLORE_GRUPPO'] /12)
+                        built_pallets[idx]['COLORE_GRUPPO'] = int(built_pallets[idx]['COLORE_GRUPPO'] /5)
                     try:
                         if built_pallets[idx]['COLORE_GRUPPO'] == colori[idx]:
                             while built_pallets[idx]['COLORE_GRUPPO'] < 255:
-                                built_pallets[idx]['COLORE_GRUPPO'] = built_pallets[idx]['COLORE_GRUPPO'] *8
+                                built_pallets[idx]['COLORE_GRUPPO'] = built_pallets[idx]['COLORE_GRUPPO'] /4
                                 colori[idx] = (built_pallets[idx]['COLORE_GRUPPO'])
                         else:
                             colori[idx] = (built_pallets[idx]['COLORE_GRUPPO'])
