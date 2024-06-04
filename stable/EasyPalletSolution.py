@@ -71,8 +71,6 @@ def create_pdf(mainfolder,data):
     built_pallets={}
     colored_codes = {}
     temp_pallet = {}
-    firstRound = True
-    chiavi = []
     chiaviJson = []
     n_p=0
     try:
@@ -88,7 +86,6 @@ def create_pdf(mainfolder,data):
                 pass
             else:
                 chiaviJson.append(Jchiave)
-        t = 0        
         for pallet in (data['Pallets']):
             i=0
             for pacco in pallet['Packs']:
@@ -140,7 +137,6 @@ def create_pdf(mainfolder,data):
                     break
         tt_lines = strt_line[1] - strt_line[0]
         j = 0
-        indici = []
         for pallet in built_pallets:
                 
             htmlColor1 = ((built_pallets[int(pallet)]['COLORE_GRUPPO']).replace('0x','#'))
@@ -313,8 +309,7 @@ WHERE 1'''
         config_path = mainfolder
         config_path += 'config.ini'
         config = configparser.ConfigParser()
-        config.read(config_path)    
-        x = str(config.get('DB_SETTINGS','db_password'))    
+        config.read(config_path) 
         try:
             mydb = mysql.connector.connect(
             host= str(config.get('DB_SETTINGS','db_host')),
@@ -515,9 +510,6 @@ WHERE 1'''
             self.close()
 
     def upload_bubble(self,single:bool, *args, **kwargs):
-        pass_flag = False
-        codici_pallet = []
-        colli = []
         pallet = {}
         for id_collo in built_pallets:
             obj = built_pallets[id_collo]
