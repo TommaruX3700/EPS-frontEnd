@@ -1,4 +1,5 @@
 import sys
+import random
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QDialog, QFormLayout, QLabel, QComboBox, QLineEdit, QHBoxLayout, QGroupBox, QHeaderView, QTableWidgetItem,QTableWidget
 from PyQt5.QtGui import QPixmap
 from PyQt5 import QtWidgets
@@ -60,12 +61,15 @@ def json_updater(json_path,Lenght,Width,Height,MXWeight,Shipment_type):
         with open(json_path,'w') as j:
             json.dump(file_data, j, indent = 4)
 
+def randColor():
+    color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])]
+    return(color[0])
 
 def create_pdf(mainfolder,data):
     '''funzione che crea il pdf partendo da un file html'''
     global built_pallets
     built_pallets={}
-    colori = {}
+    colored_codes = {}
     temp_pallet = {}
     firstRound = True
     chiavi = []
@@ -98,20 +102,17 @@ def create_pdf(mainfolder,data):
                             continue
                     built_pallets[idx] = my_data[indice]
                     built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
-                    built_pallets[idx]['COLORE_GRUPPO'] = built_pallets[idx]['CODICE_PALLET'] *12
-                    while built_pallets[idx]['COLORE_GRUPPO'] >= 255:
-                        built_pallets[idx]['COLORE_GRUPPO'] = int(built_pallets[idx]['COLORE_GRUPPO'] /5)
+                    
                     try:
-                        if built_pallets[idx]['COLORE_GRUPPO'] == colori[idx]:
-                            while built_pallets[idx]['COLORE_GRUPPO'] < 255:
-                                built_pallets[idx]['COLORE_GRUPPO'] = built_pallets[idx]['COLORE_GRUPPO'] /4
-                                colori[idx] = (built_pallets[idx]['COLORE_GRUPPO'])
+                        if colored_codes[built_pallets[idx]['CODICE_PALLET']]:
+                            built_pallets[idx]['COLORE_GRUPPO'] = colored_codes[built_pallets[idx]['CODICE_PALLET']]
                         else:
-                            colori[idx] = (built_pallets[idx]['COLORE_GRUPPO'])
+                            colored_codes[built_pallets[idx]['CODICE_PALLET']] = randColor()
+                            built_pallets[idx]['COLORE_GRUPPO'] = colored_codes[built_pallets[idx]['CODICE_PALLET']]
                     except KeyError:
-                        colori[idx] = (built_pallets[idx]['COLORE_GRUPPO'])
-                    built_pallets[idx]['COLORE_GRUPPO'] = hex(built_pallets[idx]['COLORE_GRUPPO'])
-                
+                        colored_codes[built_pallets[idx]['CODICE_PALLET']] = randColor()
+                        built_pallets[idx]['COLORE_GRUPPO'] = colored_codes[built_pallets[idx]['CODICE_PALLET']]
+                        
                 except Exception as err:
                     if firstRound is True:
                         for chiave in my_data:
@@ -120,6 +121,7 @@ def create_pdf(mainfolder,data):
                             else:
                                 chiavi.append(int(chiave))
                     firstRound = False
+                    
                     built_pallets[idx] = my_data[str(chiavi[t])]
                     built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
                     built_pallets[idx]['COLORE_GRUPPO'] = built_pallets[idx]['CODICE_PALLET'] *12
