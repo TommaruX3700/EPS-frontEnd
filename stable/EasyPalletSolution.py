@@ -114,22 +114,28 @@ def create_pdf(mainfolder,data):
                         built_pallets[idx]['COLORE_GRUPPO'] = colored_codes[built_pallets[idx]['CODICE_PALLET']]
                         
                 except Exception as err:
-                    if firstRound is True:
-                        for chiave in my_data:
-                            if chiave == 'user_settings':
-                                pass
-                            else:
-                                chiavi.append(int(chiave))
-                    firstRound = False
-                    
-                    built_pallets[idx] = my_data[str(chiavi[t])]
-                    built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
-                    built_pallets[idx]['COLORE_GRUPPO'] = built_pallets[idx]['CODICE_PALLET'] *12
-                    while built_pallets[idx]['COLORE_GRUPPO'] >= 255:
-                        built_pallets[idx]['COLORE_GRUPPO'] = int(built_pallets[idx]['COLORE_GRUPPO'] /12)
-                    built_pallets[idx]['COLORE_GRUPPO'] = int(built_pallets[idx]['COLORE_GRUPPO'] +15)
-                    built_pallets[idx]['COLORE_GRUPPO'] = hex(built_pallets[idx]['COLORE_GRUPPO'])
-                    t +=1
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Errore durante la fase di accoppiamento colore-codice")
+                    msg.setInformativeText("\nSi è verificata un'eccezione durante la fase di accoppiamento colore-codice\n\nAllegare il codice errore agli sviluppatori per correggere l'anomalia\n\nErrore: {0}\n".format(err))
+                    msg.setWindowTitle("Errore durante la fase di accoppiamento colore-codice")
+                    msg.exec_()
+                    #if firstRound is True:
+                    #    for chiave in my_data:
+                    #        if chiave == 'user_settings':
+                    #            pass
+                    #        else:
+                    #            chiavi.append(int(chiave))
+                    #firstRound = False
+                    #
+                    #built_pallets[idx] = my_data[str(chiavi[t])]
+                    #built_pallets[idx]['CODICE_PALLET'] = int(pallet['Pallet'])
+                    #built_pallets[idx]['COLORE_GRUPPO'] = built_pallets[idx]['CODICE_PALLET'] *12
+                    #while built_pallets[idx]['COLORE_GRUPPO'] >= 255:
+                    #    built_pallets[idx]['COLORE_GRUPPO'] = int(built_pallets[idx]['COLORE_GRUPPO'] /12)
+                    #built_pallets[idx]['COLORE_GRUPPO'] = int(built_pallets[idx]['COLORE_GRUPPO'] +15)
+                    #built_pallets[idx]['COLORE_GRUPPO'] = hex(built_pallets[idx]['COLORE_GRUPPO'])
+                    #t +=1
                 i=i+1
             n_p = n_p+1
 
