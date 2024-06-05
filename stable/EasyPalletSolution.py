@@ -62,7 +62,7 @@ def json_updater(json_path,Lenght,Width,Height,MXWeight,Shipment_type):
             json.dump(file_data, j, indent = 4)
 
 def randColor():
-    color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])]
+    color = ["#"+''.join([random.choice('456789ABCD') for j in range(6)])] #0123456789ABCDEF
     return(color[0])
 
 def create_pdf(mainfolder,data):
