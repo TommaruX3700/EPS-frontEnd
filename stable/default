@@ -28,27 +28,16 @@
     <div class="d-flex bd-highlight mb-3">
         <div class="me-auto p-2 bd-highlight">
             <h5><strong style="font-family:'Serif'">FOR</strong></h5>
-            <h6><small  style="font-family:'Serif'" class="text-muted">{{nome_cliente}}</small></h6>
-            <h6><small  style="font-family:'Serif'" class="text-muted">{{via_cliente}}</small></h6>
-            <h6><small style="font-family:'Serif'" class="text-muted">{{citt_cliente}}</small></h6>
-            <h6><small style="font-family:'Serif'" class="text-muted">{{naz_cliente}}</small></h6>
-            <h6><small style="font-family:'Serif'" class="text-muted">{{cap_cliente}}</small></h6>
-        </div>
-        <div style="padding-right: 3%;" class="d-flex bd-highlight mb-3">
-            <div class="me-auto p-2 bd-highlight">
-                <h6><small style="font-family:'Serif'">Delivery note N°: </small></h6>
-                <h6><small style="font-family:'Serif'">Issue date: </small></h6>
-                <h6><small style="font-family:'Serif'">Shipment Type: </small></h6>
-            </div>
-            <div class="me-auto p-2 bd-highlight">
-                <h6><strong style="font-family:'Serif'">{{n_delivery}}</strong></h6>
-                <h6><strong style="font-family:'Serif'">{{date_of_delivery}}</strong></h6>
-                <h6><strong style="font-family:'Serif'">{{shipm_type}}</strong></h6>
-            </div>
+            <h6><small class="text-muted" style="font-family:'Serif';">{{nome_cliente}} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</small><small style="font-family:'Serif';">Delivery note N°: &nbsp; </small><strong style="font-family:'Serif';">{{n_delivery}}</strong></h6>
+            <h6><small class="text-muted" style="font-family:'Serif';">{{via_cliente}} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</small><small style="font-family:'Serif';">Issue date: &nbsp;</small><strong style="font-family:'Serif';">{{date_of_delivery}}</strong></h6>
+            <h6><small class="text-muted" style="font-family:'Serif';">{{citt_cliente}} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</small><small style="font-family:'Serif';">Shipment Type: &nbsp; </small><strong style="font-family:'Serif';">{{shipm_type}}</strong></h6>
+            <h6><small class="text-muted" style="font-family:'Serif';">{{naz_cliente}}</small></h6>
+            <h6><small class="text-muted" style="font-family:'Serif';">{{cap_cliente}}</small></h6>
         </div>
     </div>
-
-    <br>
+    <p><br>&nbsp;</p>
+    <hr>
+    <p><br>&nbsp;</p>
     <hr class="container d-flex align-items-center justify-content-center" style="border-top: 8px solid #888888; border-radius: 5px; max-width: 95%;">
     <br>
     <div class="container d-flex align-items-center justify-content-center" style="max-width: 95%;">

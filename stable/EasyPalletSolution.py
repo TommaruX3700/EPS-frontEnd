@@ -365,6 +365,7 @@ WHERE 1'''
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
                 try:
                     json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None)
+                    no_selection = False
                 except UnboundLocalError as err:
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Critical)
@@ -372,39 +373,25 @@ WHERE 1'''
                     msg.setInformativeText('Nessun file CSV selezionato')
                     msg.setWindowTitle("Error")
                     msg.exec_()
-                    self.show_settings_window()
+                    no_selection = True
             else:
                 json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
-            mainfolder = mainfolderFinder()
-            config_path = ''
-            config_path += mainfolder
-            config_path += 'config.ini'
-            config = configparser.ConfigParser()
-            config.read(config_path)
-            json_path = mainfolder
-            json_path += config['DEFAULT']['nome_json']
-            checkForErrorPath = mainfolder
-            checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
-            try:
-                checkForError = (subprocess.check_output([checkForErrorPath, str(json_path)]))
-            except UnboundLocalError as err:
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Critical)
-                msg.setText("Errore")
-                msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\nErrore: {0}\n".format(err.returncode))
-                msg.setWindowTitle("Errore Critico")
-                msg.exec_()
-                exit(1)
-            except Exception as err:
-                if err.returncode == 10:
-                    msg = QMessageBox()
-                    msg.setIcon(QMessageBox.Critical)
-                    msg.setText("Errore")
-                    msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nNessun pacco selezionato o i pacchi selezionati sono corrotti\n\nErrore: {0}\n".format(err.returncode))
-                    msg.setWindowTitle("Errore Critico")
-                    msg.exec_()
-                    self.goBack()
-                else:
+            if no_selection == True:
+                self.goBack()
+            else:
+                mainfolder = mainfolderFinder()
+                config_path = ''
+                config_path += mainfolder
+                config_path += 'config.ini'
+                config = configparser.ConfigParser()
+                config.read(config_path)
+                json_path = mainfolder
+                json_path += config['DEFAULT']['nome_json']
+                checkForErrorPath = mainfolder
+                checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
+                try:
+                    checkForError = (subprocess.check_output([checkForErrorPath, str(json_path)]))
+                except UnboundLocalError as err:
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Critical)
                     msg.setText("Errore")
@@ -412,26 +399,43 @@ WHERE 1'''
                     msg.setWindowTitle("Errore Critico")
                     msg.exec_()
                     exit(1)
-            
-            json_path = mainfolder
-            json_path += 'output.json'
-            with open(json_path) as json_file:
-                data = json.load(json_file)
-            if data['UnNestedPacks'] is not None:
-                notNestet = ''
-                for pacco in data['UnNestedPacks']:
-                    notNestet += str(pacco)
-                    notNestet += ','
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Critical)
-                msg.setText("Attenzione")
-                msg.setInformativeText("\nDurante la creazione del pallet alcuni pacchi non sono stati inseriti\n\nQuando dei pacchi non vengono inseriti nel pallet, vuol dire che il pallet è troppo piccolo o già pieno.\n\nPacchi non inseriti: {0}\n".format(notNestet))
-                msg.setWindowTitle("Attenzione")
-                msg.exec_()
-            create_pdf(mainfolder,data)
-            self.settings_window = SettingsWindow(file_path)
-            self.settings_window.show()
-            self.close()
+                except Exception as err:
+                    if err.returncode == 10:
+                        msg = QMessageBox()
+                        msg.setIcon(QMessageBox.Critical)
+                        msg.setText("Errore")
+                        msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nNessun pacco selezionato o i pacchi selezionati sono corrotti\n\nErrore: {0}\n".format(err.returncode))
+                        msg.setWindowTitle("Errore Critico")
+                        msg.exec_()
+                        self.goBack()
+                    else:
+                        msg = QMessageBox()
+                        msg.setIcon(QMessageBox.Critical)
+                        msg.setText("Errore")
+                        msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nRiferire il codice sottostante agli sviluppatori per correggere l'errore.\n\nErrore: {0}\n".format(err.returncode))
+                        msg.setWindowTitle("Errore Critico")
+                        msg.exec_()
+                        exit(1)
+                
+                json_path = mainfolder
+                json_path += 'output.json'
+                with open(json_path) as json_file:
+                    data = json.load(json_file)
+                if data['UnNestedPacks'] is not None:
+                    notNestet = ''
+                    for pacco in data['UnNestedPacks']:
+                        notNestet += str(pacco)
+                        notNestet += ','
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Attenzione")
+                    msg.setInformativeText("\nDurante la creazione del pallet alcuni pacchi non sono stati inseriti\n\nQuando dei pacchi non vengono inseriti nel pallet, vuol dire che il pallet è troppo piccolo o già pieno.\n\nPacchi non inseriti: {0}\n".format(notNestet))
+                    msg.setWindowTitle("Attenzione")
+                    msg.exec_()
+                create_pdf(mainfolder,data)
+                self.settings_window = SettingsWindow(file_path)
+                self.settings_window.show()
+                self.close()
         else:
             mainfolder = mainfolderFinder()
             config_path = ''
