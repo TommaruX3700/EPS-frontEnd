@@ -372,7 +372,9 @@ WHERE 1'''
                 uscita.to_json(config['DEFAULT']['nome_json'],orient='index', indent=4)
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
                 try:
-                    json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None)
+                    json_path = mainfolderFinder()
+                    json_path += config['DEFAULT']['nome_json']
+                    json_updater(json_path=json_path,Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None)
                     no_selection = False
                 except UnboundLocalError as err:
                     msg = QMessageBox()
@@ -383,7 +385,9 @@ WHERE 1'''
                     msg.exec_()
                     no_selection = True
             else:
-                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
+                json_path = mainfolderFinder()
+                json_path += config['DEFAULT']['nome_json']
+                json_updater(json_path=json_path,Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
             if no_selection == True:
                 self.goBack()
             else:
@@ -452,7 +456,9 @@ WHERE 1'''
             config = configparser.ConfigParser()
             config.read(config_path)
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
-                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) 
+                json_path = mainfolderFinder()
+                json_path += config['DEFAULT']['nome_json']
+                json_updater(json_path=json_path,Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) 
             else:
                 try:
                     Lenght = int((kwargs.get('length_edit')).displayText())
@@ -466,9 +472,13 @@ WHERE 1'''
                     if kwargs['DBSelection']:
                         pass
                     else:
-                        json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
+                        json_path = mainfolderFinder()
+                        json_path += config['DEFAULT']['nome_json']
+                        json_updater(json_path=json_path,Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
                 except KeyError:
-                    json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
+                    json_path = mainfolderFinder()
+                    json_path += config['DEFAULT']['nome_json']
+                    json_updater(json_path=json_path,Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
             json_path = mainfolder
             json_path += config['DEFAULT']['nome_json']
             checkForErrorPath = mainfolder
@@ -750,7 +760,9 @@ class SettingsWindow(QDialog):
             self.selezione_pallet = int((self.findChild(QComboBox, 'selezione_pallet')).currentText())
         except AttributeError as err:
             pass
-        json_updater(Lenght=self.image_settings['Length'],Width=self.image_settings['Width'],Height=self.image_settings['Height'],MXWeight = self.image_settings['MXWeight'],json_path=config['DEFAULT']['nome_json'],Shipment_type=self.image_settings['type'])
+        json_path = mainfolderFinder()
+        json_path += config['DEFAULT']['nome_json']
+        json_updater(Lenght=self.image_settings['Length'],Width=self.image_settings['Width'],Height=self.image_settings['Height'],MXWeight = self.image_settings['MXWeight'],json_path=json_path,Shipment_type=self.image_settings['type'])
         self.update_image_preview()
 
     def update_image_preview(self):

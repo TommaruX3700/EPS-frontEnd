@@ -1,3 +1,9 @@
 /venv/*
 /venv
 /query
+EasyPalletSolution.exe
+EasyPalletSolution.exe
+/build/*
+/build
+/dist
+/dist/*
