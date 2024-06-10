@@ -1,0 +1,230 @@
+{
+    "FaultedPacks": [
+        11,
+        5,
+        6
+    ],
+    "Pallets": [
+        {
+            "Packs": [
+                {
+                    "id": 32,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "524785"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 33,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "951425"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 26,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "683153"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 18,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "533745"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 31,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "533633"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 25,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "533857"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 17,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "533969"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 30,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 1,
+                    "rf": false,
+                    "rs": true
+                }
+            ],
+            "Pallet": "535361"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 3,
+                    "rf": false,
+                    "rs": true
+                },
+                {
+                    "id": 13,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 21,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "534337"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 28,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 29,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 15,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "896753"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 23,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 24,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 16,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 19,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 27,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "897329"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 4,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 2,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 8,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 7,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 9,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 10,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 34,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 12,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 20,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "898785"
+        },
+        {
+            "Packs": [
+                {
+                    "id": 22,
+                    "rf": true,
+                    "rs": true
+                },
+                {
+                    "id": 14,
+                    "rf": true,
+                    "rs": true
+                }
+            ],
+            "Pallet": "535009"
+        }
+    ],
+    "UnNestedPacks": null
+}

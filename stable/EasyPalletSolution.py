@@ -2,6 +2,7 @@ import sys
 import random
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QFileDialog, QDialog, QFormLayout, QLabel, QComboBox, QLineEdit, QHBoxLayout, QGroupBox, QHeaderView, QTableWidgetItem,QTableWidget
 from PyQt5.QtGui import QPixmap
+import PyQt5.QtGui as QtGui
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 import pandas as pd
@@ -19,6 +20,13 @@ import copy
 import fitz
 
 file_path = ''
+
+try:
+    from ctypes import windll  # Only exists on Windows.
+    myappid = 'EPS.Interface.Eps_Interface.1.0.0'
+    windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+except ImportError:
+    pass
 
 def mainfolderFinder():
     '''Trova la cartella attuale'''
@@ -1269,7 +1277,9 @@ class UserSettings(QWidget):
 
 
 if __name__ == '__main__':
+    basedir = os.path.dirname(__file__)
     app = QApplication(sys.argv)
+    app.setWindowIcon(QtGui.QIcon(os.path.join(basedir, 'EPS_LOGO_rsz.ico')))
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec_())
