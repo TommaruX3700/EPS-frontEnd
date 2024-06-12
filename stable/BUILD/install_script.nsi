@@ -32,7 +32,7 @@ Section
     SetOutPath $INSTDIR
     File /r "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\dist\EasyPalletSolution\*"
 
-    ;CreateShortCut "$INSTDIR\EasyPalletSolution.lnk" "$INSTDIR\dist\EasyPalletSolution\EasyPalletSolution.exe"
+    CreateShortCut "$desktop\EasyPalletSolution.lnk" "$INSTDIR\EasyPalletSolution.exe"
     
     WriteUninstaller $INSTDIR\EPS_Uninstaller.exe
 SectionEnd

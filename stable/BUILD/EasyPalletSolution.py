@@ -642,6 +642,12 @@ WHERE 1'''
                     msg.setWindowTitle("Errore durante il collegamento al DB")
                     msg.exec_()
                     break
+            
+        msg = QMessageBox()
+        msg.setWindowTitle("Bolla spedita")
+        msg.setText("Bolla spedita correttamente")
+        x = msg.exec_()
+        self.close()
         
     def kill(self):
         self.close()
