@@ -35,8 +35,11 @@ def mainfolderFinder():
     mainfolder_buff = mainfolder_buff.split(sep='\\')
     mainfolder_buff.pop(-1)
     for name in mainfolder_buff:
-        mainfolder += name
-        mainfolder += '\\' 
+        if '__internal' in name:
+            continue
+        else:
+            mainfolder += name
+            mainfolder += '\\' 
     
     return(mainfolder)
 

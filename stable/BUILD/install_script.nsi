@@ -24,15 +24,14 @@ Section
 
     SetOutPath $INSTDIR\EPS_MODEL
     File /r "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\EPS_MODEL\*"
-    
-    SetOutPath $INSTDIR
-    File /r "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\dist\*"
 
     SetOutPath $INSTDIR
     File "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\*"
+    
+    SetOutPath $INSTDIR
+    File /r "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\dist\EasyPalletSolution\*"
 
-    CreateShortCut "$INSTDIR\EasyPalletSolution.lnk" "$INSTDIR\dist\EasyPalletSolution\EasyPalletSolution.exe"
-    CreateShortCut "$DESKTOP\EasyPalletSolution.lnk" "$INSTDIR\dist\EasyPalletSolution\EasyPalletSolution.exe"
+    ;CreateShortCut "$INSTDIR\EasyPalletSolution.lnk" "$INSTDIR\dist\EasyPalletSolution\EasyPalletSolution.exe"
     
     WriteUninstaller $INSTDIR\EPS_Uninstaller.exe
 SectionEnd
@@ -42,7 +41,7 @@ SectionEnd
 Section Uninstall
     SetOutPath $APPDATA\EPS
     SetOutPath $APPDATA
-    RMDir $APPDATA\EPS
+    RMDir $APPDATA\EPS\*
 SectionEnd
 
 
