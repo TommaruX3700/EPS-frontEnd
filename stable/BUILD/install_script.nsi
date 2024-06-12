@@ -48,7 +48,9 @@ Section Uninstall
     RMDir /r "$INSTDIR\wkhtmltox"
     Delete "$INSTDIR\EPS_MODEL\*"
     RMDir /r "$INSTDIR\EPS_MODEL"
-    
+    Delete "$INSTDIR\_internal\*"
+    RMDir /r "$INSTDIR\_internal"
+
     Delete "$INSTDIR\*"
     RMDir "$INSTDIR"
 SectionEnd

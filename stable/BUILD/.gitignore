@@ -3,8 +3,8 @@
 /query
 EasyPalletSolution.exe
 EasyPalletSolution.exe
-EPS_Installer.exe
 /BUILD/EPS_Installer.exe
+EPS_Installer.exe
 /build/*
 /build
 /build
