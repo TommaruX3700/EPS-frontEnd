@@ -2,6 +2,7 @@
 
 ; Script di installazione EPS per nsis
 
+BGGradient 800080 000000 FFFFFF
 Name "EPS_Installer"
 OutFile "EPS_Installer.exe"
 
@@ -40,10 +41,16 @@ SectionEnd
 
 Section Uninstall
     SetOutPath $TEMP
+
+    Delete "$INSTDIR\Bootstrap\*"
+    RMDir /r "$INSTDIR\Bootstrap"
+    Delete "$INSTDIR\wkhtmltox\*"
+    RMDir /r "$INSTDIR\wkhtmltox"
+    Delete "$INSTDIR\EPS_MODEL\*"
+    RMDir /r "$INSTDIR\EPS_MODEL"
     
     Delete "$INSTDIR\*"
-    Delete "$INSTDIR\EPS_Uninstaller.exe"
-	RMDir "$INSTDIR"
+    RMDir "$INSTDIR"
 SectionEnd
 
 
