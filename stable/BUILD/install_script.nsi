@@ -63,16 +63,20 @@ Section
 
 
     CreateShortCut "$DESKTOP\EPS.lnk" "$INSTDIR\EasyPalletSolution.exe"
+    
+    WriteUninstaller $INSTDIR\uninstaller.exe
 SectionEnd
 
 ; Uninstaller
 
 Section Uninstall
-    Delete $INSTDIR\*
+    Delete /r $INSTDIR\*
     RMDir $INSTDIR
-    Delete "$SMPROGRAMS\EPS_Installer\*"
+    Delete /r "$SMPROGRAMS\EPS_Installer\*"
     RMDir "$SMPROGRAMS\EPS_Installer"
 SectionEnd
+
+
 
 ;Function MakeMSI
 ;    ExecWait 'makensis.exe /V2 /DPRODUCT_NAME="EPS_Installer" /DPRODUCT_VERSION="1.0" /DMYAPPDIR="$INSTDIR" "EPS_Installer.nsi"'

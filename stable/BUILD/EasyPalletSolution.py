@@ -369,7 +369,9 @@ WHERE 1'''
                 config.read(config_path)
                 uscita= pd.read_csv(file_path, delimiter=";",usecols=["NUM_SPEDIZIONE","NUMERO_COLLO","CODICE_CLIENTE","PESO_NETTO","PESO_LORDO","BASE_MAGGIORE","BASE_MINORE","ALTEZZA","FLAG_PALETTIZZABILE","FLAG_SOVRAPPONIBILE","FLAG_RUOTABILE"])
                 uscita= uscita.fillna("")
-                uscita.to_json(config['DEFAULT']['nome_json'],orient='index', indent=4)
+                out_json = mainfolderFinder()
+                out_json +=config['DEFAULT']['nome_json']
+                uscita.to_json(out_json,orient='index', indent=4)
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
                 try:
                     json_path = mainfolderFinder()
