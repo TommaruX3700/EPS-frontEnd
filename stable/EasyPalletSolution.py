@@ -35,8 +35,11 @@ def mainfolderFinder():
     mainfolder_buff = mainfolder_buff.split(sep='\\')
     mainfolder_buff.pop(-1)
     for name in mainfolder_buff:
-        mainfolder += name
-        mainfolder += '\\' 
+        if '_internal' in name:
+            continue
+        else:
+            mainfolder += name
+            mainfolder += '\\' 
     
     return(mainfolder)
 
@@ -369,10 +372,15 @@ WHERE 1'''
                 config.read(config_path)
                 uscita= pd.read_csv(file_path, delimiter=";",usecols=["NUM_SPEDIZIONE","NUMERO_COLLO","CODICE_CLIENTE","PESO_NETTO","PESO_LORDO","BASE_MAGGIORE","BASE_MINORE","ALTEZZA","FLAG_PALETTIZZABILE","FLAG_SOVRAPPONIBILE","FLAG_RUOTABILE"])
                 uscita= uscita.fillna("")
-                uscita.to_json(config['DEFAULT']['nome_json'],orient='index', indent=4)
+                out_json = mainfolderFinder()
+                print(out_json)
+                out_json += "EPS_MODEL\input_for_model.json"
+                uscita.to_json(out_json,orient='index', indent=4)
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
                 try:
-                    json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None)
+                    json_path = mainfolderFinder()
+                    json_path += '\EPS_MODEL\input_for_model.json'
+                    json_updater(json_path=json_path,Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None)
                     no_selection = False
                 except UnboundLocalError as err:
                     msg = QMessageBox()
@@ -383,7 +391,9 @@ WHERE 1'''
                     msg.exec_()
                     no_selection = True
             else:
-                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
+                json_path = mainfolderFinder()
+                json_path += '\EPS_MODEL\input_for_model.json'
+                json_updater(json_path=json_path,Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
             if no_selection == True:
                 self.goBack()
             else:
@@ -394,7 +404,7 @@ WHERE 1'''
                 config = configparser.ConfigParser()
                 config.read(config_path)
                 json_path = mainfolder
-                json_path += config['DEFAULT']['nome_json']
+                json_path += '\EPS_MODEL\input_for_model.json'
                 checkForErrorPath = mainfolder
                 checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
                 try:
@@ -441,6 +451,14 @@ WHERE 1'''
                     msg.setWindowTitle("Attenzione")
                     msg.exec_()
                 create_pdf(mainfolder,data)
+                file_path = file_path.split(sep='/')
+                resolved_path = []
+                for percorso in file_path:
+                    if '_internal' in percorso:
+                        continue
+                    else:
+                        resolved_path.append(percorso)
+                file_path = "/".join(resolved_path)
                 self.settings_window = SettingsWindow(file_path)
                 self.settings_window.show()
                 self.close()
@@ -452,7 +470,9 @@ WHERE 1'''
             config = configparser.ConfigParser()
             config.read(config_path)
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
-                json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) 
+                json_path = mainfolderFinder()
+                json_path += '\EPS_MODEL\input_for_model.json'
+                json_updater(json_path=json_path,Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) 
             else:
                 try:
                     Lenght = int((kwargs.get('length_edit')).displayText())
@@ -466,11 +486,15 @@ WHERE 1'''
                     if kwargs['DBSelection']:
                         pass
                     else:
-                        json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
+                        json_path = mainfolderFinder()
+                        json_path += '\EPS_MODEL\input_for_model.json'
+                        json_updater(json_path=json_path,Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
                 except KeyError:
-                    json_updater(json_path=config['DEFAULT']['nome_json'],Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
+                    json_path = mainfolderFinder()
+                    json_path += '\EPS_MODEL\input_for_model.json'
+                    json_updater(json_path=json_path,Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
             json_path = mainfolder
-            json_path += config['DEFAULT']['nome_json']
+            json_path += '\EPS_MODEL\input_for_model.json'
             checkForErrorPath = mainfolder
             checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
             try:
@@ -618,6 +642,12 @@ WHERE 1'''
                     msg.setWindowTitle("Errore durante il collegamento al DB")
                     msg.exec_()
                     break
+            
+        msg = QMessageBox()
+        msg.setWindowTitle("Bolla spedita")
+        msg.setText("Bolla spedita correttamente")
+        x = msg.exec_()
+        self.close()
         
     def kill(self):
         self.close()
@@ -750,22 +780,24 @@ class SettingsWindow(QDialog):
             self.selezione_pallet = int((self.findChild(QComboBox, 'selezione_pallet')).currentText())
         except AttributeError as err:
             pass
-        json_updater(Lenght=self.image_settings['Length'],Width=self.image_settings['Width'],Height=self.image_settings['Height'],MXWeight = self.image_settings['MXWeight'],json_path=config['DEFAULT']['nome_json'],Shipment_type=self.image_settings['type'])
+        json_path = mainfolderFinder()
+        json_path += '\EPS_MODEL\input_for_model.json'
+        json_updater(Lenght=self.image_settings['Length'],Width=self.image_settings['Width'],Height=self.image_settings['Height'],MXWeight = self.image_settings['MXWeight'],json_path=json_path,Shipment_type=self.image_settings['type'])
         self.update_image_preview()
 
     def update_image_preview(self):
-        pdf = (self.root).replace("\\","/")
+        pdf = ((self.root).replace("\\","/").replace("/_internal",""))
         super().__init__()
         pdf += '/bolla.pdf'
         doc = fitz.open(pdf)
         for i, page in enumerate(doc):
-            image = (self.root).replace("\\","/")
+            image = ((self.root).replace("\\","/").replace("/_internal",""))
             pix = page.get_pixmap()
             image += "/bolla"
             image += str(i)
             image += ".png"
             pix.save(image)
-        image = (self.root).replace("\\","/")
+        image = ((self.root).replace("\\","/").replace("/_internal",""))
         image += "/bolla"
         image += str(0)
         image += ".png"
