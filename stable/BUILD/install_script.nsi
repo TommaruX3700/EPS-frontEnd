@@ -16,11 +16,11 @@ Page InstFiles
 ; Sections
 Section
     SetOutPath $INSTDIR\Bootstrap
-    File "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\Bootstrap\bootstrap-5.0.2-dist\css\*"
-    File "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\Bootstrap\bootstrap-5.0.2-dist\js\*"
+    File /r "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\Bootstrap\*"
+    File /r "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\Bootstrap\*"
 
     SetOutPath $INSTDIR\wkhtmltox
-    File "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\wkhtmltox\*"
+    File /r "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\wkhtmltox\*"
 
     SetOutPath $INSTDIR\EPS_MODEL
     File /r "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\EPS_MODEL\*"
@@ -62,7 +62,7 @@ Section
     ;File "C:\Users\aless\Documents\sviluppi\TEAMWORKING_29-4-24\EPS-frontEnd\stable\BUILD\dist\EasyPalletSolution\_internal\win32\*"
 
 
-    CreateShortCut "$DESKTOP\EPS.lnk" "$INSTDIR\dist\EasyPalletSolution\EasyPalletSolution.exe"
+    CreateShortCut "$DESKTOP\EPS.lnk" "$INSTDIR\EasyPalletSolution.exe"
 SectionEnd
 
 ; Uninstaller
