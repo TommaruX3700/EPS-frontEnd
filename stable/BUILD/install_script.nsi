@@ -39,9 +39,11 @@ SectionEnd
 ; Uninstaller
 
 Section Uninstall
-    SetOutPath $APPDATA\EPS
-    SetOutPath $APPDATA
-    RMDir $APPDATA\EPS\*
+    SetOutPath $TEMP
+    
+    Delete "$INSTDIR\*"
+    Delete "$INSTDIR\EPS_Uninstaller.exe"
+	RMDir "$INSTDIR"
 SectionEnd
 
 

@@ -10,3 +10,5 @@ EPS_Installer.exe
 /build
 /dist
 /dist/*
+dist
+build
