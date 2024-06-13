@@ -18,6 +18,7 @@ from datetime import datetime
 from PyQt5.QtWidgets import QApplication,QMessageBox
 import copy
 import fitz
+import math
 
 file_path = ''
 
@@ -42,6 +43,29 @@ def mainfolderFinder():
             mainfolder += '\\' 
     
     return(mainfolder)
+
+def clean_json (*args, **kwargs):
+    '''Funzione che rimuove la virgola dai valori float, arrotondandoli'''
+    json_path = args[0]
+    with open(json_path,'r') as j:
+        data = json.load(j)
+    for indice in data:
+        obj = data[indice]
+        for foo in obj:
+            if foo == 'FLAG_PALETTIZZABILE' or foo == 'FLAG_SOVRAPPONIBILE' or foo == 'FLAG_RUOTABILE':
+                continue
+            try:
+                obj[foo] =  math.ceil(int(obj[foo]))
+                if foo == 'PESO_NETTO' or foo == 'PESO_LORDO':
+                    obj[foo] = str(obj[foo])
+            except ValueError:
+                obj[foo] = (obj[foo]).replace(',','.')
+                obj[foo] =  math.ceil(float(obj[foo]))
+                if foo == 'PESO_NETTO' or foo == 'PESO_LORDO':
+                    obj[foo] = str(obj[foo])
+      
+    with open(json_path,'w') as j:                
+        json.dump(data, j, indent = 4)
 
 def json_updater(json_path,Lenght,Width,Height,MXWeight,Shipment_type):
     if Lenght is None or Width is None or Height is None:
@@ -376,6 +400,7 @@ WHERE 1'''
                 print(out_json)
                 out_json += "EPS_MODEL\input_for_model.json"
                 uscita.to_json(out_json,orient='index', indent=4)
+                clean_json(out_json)
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
                 try:
                     json_path = mainfolderFinder()
@@ -601,9 +626,48 @@ WHERE 1'''
                     msg.exec_()
                     break
                 
-            
-            
-            
+            for pacco in built_pallets:
+                query = """INSERT INTO pacchi (ID_PACCO, NUM_SPEDIZIONE, CODICE_CLIENTE, PESO_NETTO, PESO_LORDO, BASE_MAGGIORE, BASE_MINORE, ALTEZZA, FLAG_PALLETTIZZABILE,  FLAG_SOVRAPPONIBILE, FLAG_RUOTABILE)
+                            SELECT {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, '{8}', '{9}', '{10}'
+                            WHERE NOT EXISTS (SELECT 1 FROM pacchi WHERE ID_PACCO = {0});
+                            """.format(built_pallets[pacco]['NUMERO_COLLO'],built_pallets[pacco]['NUM_SPEDIZIONE'],built_pallets[pacco]['CODICE_CLIENTE'],built_pallets[pacco]['PESO_NETTO'],
+                                       built_pallets[pacco]['PESO_LORDO'],built_pallets[pacco]['BASE_MAGGIORE'],built_pallets[pacco]['BASE_MINORE'],built_pallets[pacco]['ALTEZZA'],built_pallets[pacco]['FLAG_PALETTIZZABILE'],
+                                       built_pallets[pacco]['FLAG_SOVRAPPONIBILE'],built_pallets[pacco]['FLAG_RUOTABILE'],)
+
+                config_path = mainfolderFinder()
+                config_path += 'config.ini'
+                config = configparser.ConfigParser()
+                config.read(config_path)   
+                try:
+                    mydb = mysql.connector.connect(
+                    host= str(config.get('DB_SETTINGS','db_host')),
+                    user=str(config.get('DB_SETTINGS','db_username')),
+                    password=str(config.get('DB_SETTINGS','db_password')),
+                    database=str(config.get('DB_SETTINGS','db_name')),
+                    )
+                    print(query)
+                    mycursor = mydb.cursor()
+                    mycursor.execute(query)
+                    mydb.commit()
+                    mycursor.close()
+                except mysql.connector.errors.DatabaseError as err:
+                    if err.errno == 1064:
+                        msg = QMessageBox()
+                        msg.setIcon(QMessageBox.Critical)
+                        msg.setText("Errore")
+                        msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nNessun pacco selezionato o i pacchi selezionati sono corrotti\n\n")
+                        msg.setWindowTitle("Errore Critico")
+                        msg.exec_()
+                        self.kill()
+                        break
+                    else: 
+                        msg = QMessageBox()
+                        msg.setIcon(QMessageBox.Critical)
+                        msg.setText("Errore durante il collegamento al DB")
+                        msg.setInformativeText("\nSi è verificata un'eccezione durante il collegamento al database\n\nControllare che l'indirizzo del DataBase sia corretto e che sia raggiungibile\n")
+                        msg.setWindowTitle("Errore durante il collegamento al DB")
+                        msg.exec_()
+                        break
                 
                 
             query = """UPDATE pacchi 

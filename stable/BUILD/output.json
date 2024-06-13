@@ -1,174 +1,15 @@
 {
-    "FaultedPacks": [
-        11,
-        5,
-        6
-    ],
+    "FaultedPacks": null,
     "Pallets": [
         {
             "Packs": [
                 {
-                    "id": 32,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "020849"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 33,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "906241"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 26,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "179217"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 18,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "029809"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 31,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "029697"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 25,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "029921"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 17,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "030033"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 30,
+                    "id": 2,
                     "rf": true,
                     "rs": true
                 },
-                {
-                    "id": 1,
-                    "rf": false,
-                    "rs": true
-                }
-            ],
-            "Pallet": "031425"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 3,
-                    "rf": false,
-                    "rs": true
-                },
-                {
-                    "id": 13,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 21,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "030401"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 28,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 29,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 15,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "851569"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 23,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 24,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 16,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 19,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 27,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "852145"
-        },
-        {
-            "Packs": [
                 {
                     "id": 4,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 2,
                     "rf": true,
                     "rs": true
                 },
@@ -183,12 +24,12 @@
                     "rs": true
                 },
                 {
-                    "id": 9,
+                    "id": 10,
                     "rf": true,
                     "rs": true
                 },
                 {
-                    "id": 10,
+                    "id": 9,
                     "rf": true,
                     "rs": true
                 },
@@ -198,32 +39,17 @@
                     "rs": true
                 },
                 {
-                    "id": 12,
-                    "rf": true,
-                    "rs": true
-                },
-                {
                     "id": 20,
                     "rf": true,
                     "rs": true
-                }
-            ],
-            "Pallet": "853601"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 22,
-                    "rf": true,
-                    "rs": true
                 },
                 {
-                    "id": 14,
+                    "id": 12,
                     "rf": true,
                     "rs": true
                 }
             ],
-            "Pallet": "031073"
+            "Pallet": "203537"
         }
     ],
     "UnNestedPacks": null
