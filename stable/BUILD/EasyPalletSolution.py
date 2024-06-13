@@ -90,7 +90,7 @@ def create_pdf(mainfolder,data):
         or_html = mainfolder
         or_html += 'default'
         json_path = mainfolder
-        json_path += '\EPS_MODEL\input_for_model.json'
+        json_path += 'EPS_MODEL\input_for_model.json'
         my_data = load_json(json_path)
         for Jchiave in my_data:
             if Jchiave == 'user_settings':
@@ -379,7 +379,7 @@ WHERE 1'''
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
                 try:
                     json_path = mainfolderFinder()
-                    json_path += '\EPS_MODEL\input_for_model.json'
+                    json_path += 'EPS_MODEL\input_for_model.json'
                     json_updater(json_path=json_path,Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None)
                     no_selection = False
                 except UnboundLocalError as err:
@@ -392,7 +392,7 @@ WHERE 1'''
                     no_selection = True
             else:
                 json_path = mainfolderFinder()
-                json_path += '\EPS_MODEL\input_for_model.json'
+                json_path += 'EPS_MODEL\input_for_model.json'
                 json_updater(json_path=json_path,Lenght=kwargs.get('length_edit'),Width=kwargs.get('width_edit'),Height=kwargs.get('height_edit'),MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
             if no_selection == True:
                 self.goBack()
@@ -404,7 +404,7 @@ WHERE 1'''
                 config = configparser.ConfigParser()
                 config.read(config_path)
                 json_path = mainfolder
-                json_path += '\EPS_MODEL\input_for_model.json'
+                json_path += 'EPS_MODEL\input_for_model.json'
                 checkForErrorPath = mainfolder
                 checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
                 try:
@@ -471,7 +471,7 @@ WHERE 1'''
             config.read(config_path)
             if (kwargs.get('width_edit') is None or kwargs.get('weight_edit') is None or kwargs.get('height_edit') is None or kwargs.get('length_edit') is None ):
                 json_path = mainfolderFinder()
-                json_path += '\EPS_MODEL\input_for_model.json'
+                json_path += 'EPS_MODEL\input_for_model.json'
                 json_updater(json_path=json_path,Lenght=None,Width=None,Height=None,MXWeight=None,Shipment_type=None) 
             else:
                 try:
@@ -487,14 +487,14 @@ WHERE 1'''
                         pass
                     else:
                         json_path = mainfolderFinder()
-                        json_path += '\EPS_MODEL\input_for_model.json'
+                        json_path += 'EPS_MODEL\input_for_model.json'
                         json_updater(json_path=json_path,Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
                 except KeyError:
                     json_path = mainfolderFinder()
-                    json_path += '\EPS_MODEL\input_for_model.json'
+                    json_path += 'EPS_MODEL\input_for_model.json'
                     json_updater(json_path=json_path,Lenght=Lenght,Width=Width,Height=Height,MXWeight=40,Shipment_type=kwargs.get('shipment_type'))
             json_path = mainfolder
-            json_path += '\EPS_MODEL\input_for_model.json'
+            json_path += 'EPS_MODEL\input_for_model.json'
             checkForErrorPath = mainfolder
             checkForErrorPath += 'EPS_MODEL\\EPS_MODEL.exe'
             try:
@@ -781,7 +781,7 @@ class SettingsWindow(QDialog):
         except AttributeError as err:
             pass
         json_path = mainfolderFinder()
-        json_path += '\EPS_MODEL\input_for_model.json'
+        json_path += 'EPS_MODEL\input_for_model.json'
         json_updater(Lenght=self.image_settings['Length'],Width=self.image_settings['Width'],Height=self.image_settings['Height'],MXWeight = self.image_settings['MXWeight'],json_path=json_path,Shipment_type=self.image_settings['type'])
         self.update_image_preview()
 
@@ -932,8 +932,8 @@ class palletSelection(QWidget):
                 if idx == '':
                     pass
                 else:
-                    idx = int(idx)
-                    colonneSelezionate[str(chiavi[i])] = qryRes[str(chiavi[i])]
+                    idx = int(idx) -2
+                    colonneSelezionate[str(chiavi[idx])] = qryRes[str(chiavi[idx])]
                     i +=1
         self.close()
         

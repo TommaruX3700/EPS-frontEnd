@@ -1,179 +1,25 @@
 {
-    "FaultedPacks": [
-        11,
-        5,
-        6
-    ],
+    "FaultedPacks": null,
     "Pallets": [
         {
             "Packs": [
                 {
-                    "id": 32,
-                    "rf": true,
+                    "id": 9,
+                    "rf": false,
                     "rs": true
                 }
             ],
-            "Pallet": "358353"
+            "Pallet": "382625"
         },
         {
             "Packs": [
-                {
-                    "id": 33,
-                    "rf": true,
-                    "rs": true
-                }
-            ],
-            "Pallet": "243713"
-        },
-        {
-            "Packs": [
-                {
-                    "id": 26,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 18,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 31,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 25,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 17,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 30,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 3,
-                    "rf": false,
-                    "rs": true
-                },
-                {
-                    "id": 1,
-                    "rf": false,
-                    "rs": true
-                },
-                {
-                    "id": 13,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 21,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 29,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 28,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 23,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 24,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 15,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 16,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 19,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 27,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 2,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 4,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 8,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 7,
-                    "rf": true,
-                    "rs": true
-                },
                 {
                     "id": 10,
                     "rf": true,
                     "rs": true
-                },
-                {
-                    "id": 9,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 34,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 14,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 22,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 12,
-                    "rf": true,
-                    "rs": true
-                },
-                {
-                    "id": 20,
-                    "rf": true,
-                    "rs": true
                 }
             ],
-            "Pallet": "516465"
+            "Pallet": "946017"
         }
     ],
     "UnNestedPacks": null
