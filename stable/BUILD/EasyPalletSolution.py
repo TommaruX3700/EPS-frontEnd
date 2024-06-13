@@ -46,10 +46,10 @@ def mainfolderFinder():
 def json_updater(json_path,Lenght,Width,Height,MXWeight,Shipment_type):
     if Lenght is None or Width is None or Height is None:
         new_data ={"Shipment_type":"NA",
-        "Lenght": 120,
-        "Width": 120,
-        "Height": 120,
-        "MXWeight" : 20
+        "Lenght": 800,
+        "Width": 1200,
+        "Height": 800,
+        "Max Weight": 40
         }
         with open(json_path,'r+') as j:
             file_data = json.load(j)
@@ -556,11 +556,15 @@ WHERE 1'''
                 pallet[obj['CODICE_PALLET']].append(obj['NUMERO_COLLO'])
         
         for palletID in pallet:
-            
-            query = '''INSERT INTO pallet (CODICE_PALLET)
-            SELECT {0}
+            json_path = mainfolderFinder()
+            json_path += 'EPS_MODEL\input_for_model.json'
+            with open(json_path,'r') as j:
+                data_from_json = json.load(j)
+            data_from_json = data_from_json['user_settings']
+            query = '''INSERT INTO pallet (CODICE_PALLET, DIM_X_PALLET, DIM_Y_PALLET, DIM_Z_PALLET)
+            SELECT {0}, {1}, {2}, {3}
             WHERE NOT EXISTS (SELECT 1 FROM pallet WHERE CODICE_PALLET = {0});
-            '''.format(str(palletID))
+            '''.format(str(palletID),str(data_from_json['Lenght']),str(data_from_json['Width']),str(data_from_json['Height']))
             
             config_path = mainfolderFinder()
             config_path += 'config.ini'
@@ -596,6 +600,11 @@ WHERE 1'''
                     msg.setWindowTitle("Errore durante il collegamento al DB")
                     msg.exec_()
                     break
+                
+            
+            
+            
+                
                 
             query = """UPDATE pacchi 
             SET CODICE_PALLET = {0}
