@@ -10,5 +10,6 @@ EPS_Installer.exe
 /build
 /dist
 /dist/*
+default.old
 dist
 build
