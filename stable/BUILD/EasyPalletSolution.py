@@ -107,6 +107,7 @@ def create_pdf(mainfolder,data):
     colored_codes = {}
     temp_pallet = {}
     chiaviJson = []
+    is_exception = False
     n_p=0
     try:
         html_path = mainfolder
@@ -152,8 +153,12 @@ def create_pdf(mainfolder,data):
                     msg.setInformativeText("\nSi è verificata un'eccezione durante la fase di accoppiamento colore-codice\n\nAllegare il codice errore agli sviluppatori per correggere l'anomalia\n\nErrore: {0}\n".format(err))
                     msg.setWindowTitle("Errore durante la fase di accoppiamento colore-codice")
                     msg.exec_()
+                    is_exception = True
+                    break
                     
                 i=i+1
+            if is_exception:
+                break
             n_p = n_p+1
 
         with open(or_html, 'r') as h:
@@ -182,28 +187,28 @@ def create_pdf(mainfolder,data):
             k = strt_line[1]
             stringhe = []
             if j % 2 == 0:
-                stringhe.append('''<tr id="colonna_dinamica" style="background-color:{0};">\n'''.format(htmlColor1)) # 
+                stringhe.append('''<tr id="colonna_dinamica" style="background-color:{0};border: 1px solid black;">\n'''.format(htmlColor1)) # 
             else:
-                stringhe.append('''<tr id="colonna_dinamica" style="background-color:{0};">\n'''.format(htmlColor1))
+                stringhe.append('''<tr id="colonna_dinamica" style="background-color:{0};border: 1px solid black;">\n'''.format(htmlColor1))
                 
-            stringhe.append('''<th scope="row" style="font-family:\'Serif\'">{0}</th>\n'''.format(built_pallets[int(pallet)]['CODICE_PALLET']))
-            stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(str(pallet)))
+            stringhe.append('''<th scope="row" style="font-family:\'Serif\';border: 1px solid black;">{0}</th>\n'''.format(built_pallets[int(pallet)]['CODICE_PALLET']))
+            stringhe.append('''<td style="font-family:\'Serif\';border: 1px solid black;">{0}</td>\n'''.format(str(pallet)))
             dimensioni = str(built_pallets[int(pallet)]['BASE_MAGGIORE'])
             dimensioni += 'x'
             dimensioni += str(built_pallets[int(pallet)]['BASE_MINORE'])
-            stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(dimensioni))
+            stringhe.append('''<td style="font-family:\'Serif\';border: 1px solid black;">{0}</td>\n'''.format(dimensioni))
             fr = built_pallets[int(pallet)]['FLAG_RUOTABILE']
             if fr == '':
                 fr = 'No'
             else:
                 fr = 'Yes'
-            stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(fr))   
+            stringhe.append('''<td style="font-family:\'Serif\';border: 1px solid black;">{0}</td>\n'''.format(fr))   
             fs = built_pallets[int(pallet)]['FLAG_SOVRAPPONIBILE']
             if fs == '':
                 fs = 'No'
             else:
                 fs = 'Yes'
-            stringhe.append('''<td style="font-family:\'Serif\'">{0}</td>\n'''.format(fs))
+            stringhe.append('''<td style="font-family:\'Serif\';border: 1px solid black;">{0}</td>\n'''.format(fs))
             stringhe.append('''</tr id="end_of_colonna_dinamica">\n''')
             for stringa in stringhe:
                 buffer.insert(k,stringa)
@@ -225,20 +230,16 @@ def create_pdf(mainfolder,data):
         config_path += 'config.ini'
         config = configparser.ConfigParser()
         config.read(config_path)
-        jsPath = mainfolder
-        jsPath += 'Bootstrap\\bootstrap-5.0.2-dist\\js\\bootstrap.js'
         photoPath = mainfolder
         photoPath += 'EPS_LOGO_rsz.png'
-        style_path = mainfolderFinder()
-        style_path = 'style.css'
         template = template_env.get_template('template_bolla.html')
         dt_naive = datetime.now()
-        context={"bootstrap_5_PATH":cssPath,"bootstrapScript_5_PATH":jsPath,"EPS_logo_PATH":photoPath,"style_path":style_path,"nome_cliente":str(config.get('RECAPITI','nome')),"via_cliente": str(config.get('RECAPITI','via')),"citt_cliente":str(config.get('RECAPITI','citta')),"naz_cliente":str(config.get('RECAPITI','nazione')),"cap_cliente":int(config.get('RECAPITI','cap')),"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M"),"shipm_type":my_data['user_settings']['Shipment_type']}
+        context={"bootstrap_5_PATH":cssPath,"EPS_logo_PATH":photoPath,"nome_cliente":str(config.get('RECAPITI','nome')),"via_cliente": str(config.get('RECAPITI','via')),"citt_cliente":str(config.get('RECAPITI','citta')),"naz_cliente":str(config.get('RECAPITI','nazione')),"cap_cliente":int(config.get('RECAPITI','cap')),"plt_idx":1,"art_cdx":2,"dim":"24x60 Cm","RT_flag":True,"SV_flag":False,"n_delivery":4,"date_of_delivery":dt_naive.strftime("%d/%m/%Y %H:%M"),"shipm_type":my_data['user_settings']['Shipment_type']}
         output_text = template.render(context)
         wkhtmltopdf = mainfolder
         wkhtmltopdf += 'wkhtmltox\\bin\\wkhtmltopdf.exe'
         pdfConfig = pdfkit.configuration(wkhtmltopdf= wkhtmltopdf)
-        pdfkit.from_string(output_text,options={"enable-local-file-access": ""}, output_path=bollaPathOut, configuration=pdfConfig,css=style_path)
+        pdfkit.from_string(output_text,options={"enable-local-file-access": ""}, output_path=bollaPathOut, configuration=pdfConfig)
     except TypeError as err:
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
