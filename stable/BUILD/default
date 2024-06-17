@@ -4,41 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>pdf_template</title>
-    <!--<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>-->
-    <!-- <link rel="stylesheet" href="{{bootstrap_5_PATH}}"> -->
-    <!-- <script src="{{bootstrapScript_5_PATH}}"></script> -->
-    <style>
-        .headerLayout {
-            width: auto;
-            height: auto;
-            display: grid;
-            column-gap: 50px; 
-            margin-top: 12px;
-            margin-bottom: 12px;
-            font-family: Serif;
-        }
-        .Ship_Info_1 {
-            grid-column: 1;
-            align-content: center;
-            text-align: center;
-            font-size: calc(5px + 2vmin);
-            vertical-align: center;
-        }
-        .Ship_Info_2 {
-            grid-column: 3;
-            align-content: center;
-            text-align: center;
-            font-size: calc(5px + 2vmin);
-            vertical-align: center;
-        }
-        .Spacer {
-            grid-column: 2;
-            align-content: center;
-            text-align: center;
-            font-size: calc(5px + 2vmin);
-            vertical-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="{{bootstrap_5_PATH}}"></link>
 </head>
 <body>
     <div class="rounded float-end"> <!--position-absolute top-0 end-0-->
@@ -80,9 +46,9 @@
         </div>
     </div>
 
-    <p><br>&nbsp;</p>
+    <!--<p><br>&nbsp;</p>
     <hr>
-    <p><br>&nbsp;</p>
+    <p><br>&nbsp;</p>-->
     <hr class="container d-flex align-items-center justify-content-center" style="border-top: 8px solid #888888; border-radius: 5px; max-width: 95%;">
     <br>
     <div class="container d-flex align-items-center justify-content-center" style="max-width: 95%;">

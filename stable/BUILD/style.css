@@ -1,0 +1,30 @@
+.headerLayout {
+    width: auto;
+    height: auto;
+    display: grid;
+    column-gap: 50px; 
+    margin-top: 12px;
+    margin-bottom: 12px;
+    font-family: Serif;
+}
+.Ship_Info_1 {
+    grid-column: 1;
+    align-content: center;
+    text-align: center;
+    font-size: calc(5px + 2vmin);
+    vertical-align: center;
+}
+.Ship_Info_2 {
+    grid-column: 3;
+    align-content: center;
+    text-align: center;
+    font-size: calc(5px + 2vmin);
+    vertical-align: center;
+}
+.Spacer {
+    grid-column: 2;
+    align-content: center;
+    text-align: center;
+    font-size: calc(5px + 2vmin);
+    vertical-align: center;
+}
