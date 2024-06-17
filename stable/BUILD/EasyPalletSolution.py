@@ -658,7 +658,7 @@ WHERE 1'''
                         msg = QMessageBox()
                         msg.setIcon(QMessageBox.Critical)
                         msg.setText("Errore")
-                        msg.setInformativeText("\nDurante l'esecuzione dell'algoritmo di nesting si è verificata un'eccezione\n\nNessun pacco selezionato o i pacchi selezionati sono corrotti\n\n")
+                        msg.setInformativeText("\nDurante la spedizione della bolla si è verificata un'eccezione\n\nRiferire il seguente errore agli sviluppatori\n\nERR: {0}".format(err))
                         msg.setWindowTitle("Errore Critico")
                         msg.exec_()
                         self.kill()
@@ -1150,7 +1150,11 @@ class databasePage(QWidget):
         self.tableWidget = QTableWidget() 
         w = QtWidgets.QWidget()
         grid = QtWidgets.QGridLayout(w)
-        self.tableWidget.setRowCount(len(dbResult))  
+        lista_indici = []
+        for idx in dbResult:
+            lista_indici.append(int(idx))
+        lista_indici.sort()
+        self.tableWidget.setRowCount(lista_indici[len(lista_indici)-1])
         self.tableWidget.setColumnCount(12)           
         
         self.tableWidget.setItem(0,0, QTableWidgetItem("ID_PACCO"))
@@ -1166,6 +1170,7 @@ class databasePage(QWidget):
         self.tableWidget.setItem(0,10, QTableWidgetItem("FLAG_SOVRAPPONIBILE"))
         self.tableWidget.setItem(0,11, QTableWidgetItem("FLAG_RUOTABILE"))
         
+        i=0
         for row in dbResult:
             self.tableWidget.setItem((int(row)),0, QTableWidgetItem(str(dbResult[row][0])))
             self.tableWidget.setItem((int(row)),1, QTableWidgetItem(str((dbResult[row])[1]))) 
@@ -1179,6 +1184,7 @@ class databasePage(QWidget):
             self.tableWidget.setItem((int(row)),9, QTableWidgetItem(str((dbResult[row])[9]))) 
             self.tableWidget.setItem((int(row)),10, QTableWidgetItem(str((dbResult[row])[10])))
             self.tableWidget.setItem((int(row)),11, QTableWidgetItem(str((dbResult[row])[11])))
+            i=i+1
    
         self.tableWidget.horizontalHeader().setStretchLastSection(True) 
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
